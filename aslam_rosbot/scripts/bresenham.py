@@ -50,4 +50,4 @@ def bresenham(gridMap, x1, y1, x2, y2):
 		
 
 
-	return (X_bres, Y_bres)
+	return zip(X_bres, Y_bres)

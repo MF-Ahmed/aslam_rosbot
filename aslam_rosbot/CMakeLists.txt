@@ -86,6 +86,12 @@ target_link_libraries(d_opt_local_rrt_detector ${catkin_LIBRARIES})
 
 add_executable(entropy src/entropy.cpp)
 target_link_libraries(entropy ${catkin_LIBRARIES})
-add_dependencies(entropy aslam_rosbot_generate_messages_cpp)
+
+add_executable(raytracing src/raytracing.cpp )
+target_link_libraries(raytracing ${catkin_LIBRARIES})
+
+
+
+
 
 

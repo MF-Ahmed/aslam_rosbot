@@ -15,16 +15,22 @@ from std_msgs.msg import String
 from nav_msgs.msg import Path, OccupancyGrid
 from functions import *
 from constants import csv_path_1, csv_path_2, csv_path_3
-from bresenham import bresenham
+from PIL import Image, ImageDraw
 #from occupancy_grid_utils.ray_trace import bresenham2D
 
-
+from bresenham import bresenham
 
 from geometry_msgs.msg import Pose, Point, Quaternion, Vector3, Polygon
 from tf import transformations # rotation_matrix(), concatenate_matrices()
 
 
 from nav_msgs.msg import OccupancyGrid
+from std_msgs.msg import ColorRGBA
+
+
+
+
+
 
 class ComputeEntropy(object):
     def __init__(self):
@@ -95,62 +101,98 @@ class ComputeEntropy(object):
         #    rate.sleep()
 
     def chosenfrontiercallback(self, data):
+
         self.chosenfrontier_posx = data.chosenfrontierxy_pos.x   
         self.chosenfrontier_posy = data.chosenfrontierxy_pos.y  
-        marker_pos_x = -0.5
-        marker_pos_y = 5   
 
-        marker_posd_x = -0.5
-        marker_posd_y = -5   
+       
+        marker_pos_x = int(self.frontier_plan.robotxy_pos.x)
+        marker_pos_y = int(self.frontier_plan.robotxy_pos.y)
+       
+
+
+        start_point = Point(data.robotxy_pos.x, data.robotxy_pos.y, 0)
+        end_point = Point(data.chosenfrontierxy_pos.x, data.chosenfrontierxy_pos.y, 0)
+
+        ray_cells, occupency_values = self.ray_tracing(start_point, end_point)
+        rospy.loginfo("------- ray_cells ----------------{}".format(ray_cells)) 
+        rospy.loginfo("------- ray_cells shape ----------------{}".format(len(ray_cells))) 
+
+        rospy.loginfo("------- occupency_values ----------------{}".format(occupency_values)) 
+        rospy.loginfo("------- occupency_values ----------------{}".format(len(occupency_values)))         
+
+        new_map_data = self.draw_ray_on_map(ray_cells)
+        rospy.loginfo("------- new_map_data ----------------{}".format(new_map_data)) 
+        rospy.loginfo("------- new_map_data shape is {} ".format(new_map_data.shape)) 
         
+
+        #self.plot_map_with_markers(map_data)
+
+
+
+        #print('Ray cells:', ray_cells)
+        
+        #marker_pos_x = int((marker_pos_x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        #marker_pos_y  = int((marker_pos_y- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+              
+        #rospy.loginfo("{}  marker_pos_x ".format(marker_pos_x))
+        #rospy.loginfo("{}  marker_pos_y ".format(marker_pos_y ))  
+        #      
+        marker_posd_x = int(self.chosenfrontier_posx)
+        marker_posd_y = int(self.chosenfrontier_posy)
+
+        #marker_posd_x = int((marker_posd_x - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        #marker_posd_y  = int((marker_posd_y - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)       
+
+        # Returns the mapData's index of a given point (x,y) in the map
+        #def index_of_point(mapData, Xp):
+
+        # Returns the point (x,y) of a given mapData's index
+        #
+        # def point_of_index(mapData, i):    
+        #Aloo = point_of_index(self.map_msg, marker_posd_x )
+
+        #rospy.loginfo("index of marker_posd_x is {},{}  ".format(Aloo[0],format(Aloo[1])))
         #index_of_point()
         #point_of_index()
+
         markerArray = MarkerArray()
+        #points = bresenham(self.map_msg.data, int(data.robotxy_pos.x), int(data.robotxy_pos.y), int(self.chosenfrontier_posx), int(self.chosenfrontier_posy))     
+        #rospy.loginfo("I got {} points from Breshenam ".format(len(points[0])))         
+                           
+        #points_xy =  np.zeros((2, int(len(points[0]))))
 
-        points = bresenham(self.map_msg.data, marker_pos_x, marker_pos_y, marker_posd_x, marker_posd_y)
-        rospy.loginfo("I got {} points from Breshenam ".format(len(points[0])))        
-        rospy.loginfo("{}  from breshnam ".format(points[0][0] ))
-        rospy.loginfo("{}  from breshnam ".format(points[1][0] ))
-        rospy.loginfo("{}  from breshnam ".format(points[0][1] ))
-        rospy.loginfo("{}  from breshnam ".format(points[1][1] ))         
+        #for i in range(len(points[0])):              
+            #points_xy[0][i] = points[0][i]
+            #points_xy[1][i] = points[1][i]
+            #marker = self.draw_marker(points_xy[0][i],points_xy[1][i], [0.5,0.5,0.7],"cube",0.3)
+            #marker.id= i                
+            #markerArray.markers.append(marker)  
+        #self.markerArray_pub.publish(markerArray)  
+        #Xp=[data.chosenfrontierxy_pos.x  ,data.chosenfrontierxy_pos.y]
         
-        marker = self.draw_marker(points[0][0],points[1][0], [0.2,0.5,0.7],"cube",0.5)
-        marker.id= 1                
-        markerArray.markers.append(marker)  
-        marker = self.draw_marker(points[0][1],points[1][1] ,[0.2,0.5,0.7],"cube",0.5)
-        marker.id= 2                
-        markerArray.markers.append(marker)          
-        marker = self.draw_marker(points[0][2],points[1][2], [0.2,0.5,0.7],"cube",0.5)
-        marker.id= 3                
-        markerArray.markers.append(marker)          
-        marker = self.draw_marker(points[0][3],points[1][3] ,[0.2,0.5,0.7],"cube",0.5)
-        marker.id= 4                
-        markerArray.markers.append(marker)    
-        self.markerArray_pub.publish(markerArray)                                                   
-
-
-
-        for x in points:
-            rospy.loginfo("{}  from breshnam zip ".format(x))
-
-            
         
+        Xp=[data.robotxy_pos.x,data.robotxy_pos.y]            
+        
+        Xp_pixels_x = int((Xp[0] - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        Xp_pixels_y = int((Xp[1] - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)       
 
-
+        rospy.loginfo("------- Xp is  {},{} ----------------".format(Xp[0],Xp[1]))          
+        rospy.loginfo("------- Xp in pixels is  {},{} ----------------".format(Xp_pixels_x,Xp_pixels_y))                            
+        
         marker = Marker()
-        marker = self.draw_marker(marker_pos_x,marker_pos_y, [0.5,0.5,1],"cube",0.5)  
-        i = int((marker_pos_x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
-        j = int((marker_pos_y- self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
-        if i >= 0 and i < self.map_msg.info.width and j >= 0 and j < self.map_msg.info.height:
+        value=gridValue(self.map_msg, Xp)        
+        rospy.loginfo("------- occupancy_value  at Xp is  {} ----------------".format(value))          
+        marker = self.draw_marker(data.chosenfrontierxy_pos.x,data.chosenfrontierxy_pos.y, [0.5,0.1,0.7],"cube",0.6)
+        marker.id= 200
+        self.marker_pub.publish(marker) 
+
+        #i = int((marker_pos_x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        #j = int((marker_pos_y- self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
+        #if Aloo[0] >= 0 and Aloo[0] < self.map_msg.info.width and Aloo[1] >= 0 and Aloo[1] < self.map_msg.info.height:
         # Extract the occupancy value at the desired location
-        #rospy.loginfo("i  = {}".format(i))
-        #rospy.loginfo("j  = {}".format(j))
-            occupancy_value = self.map_msg.data[i + j * self.map_msg.info.width]
-            rospy.loginfo("------- occupancy_value is  {} ----------------".format(occupancy_value ))
-
-
-        self.marker_pub.publish(marker)
-
+            #occupancy_value = self.map_msg.data[Aloo[0] + Aloo[1] * self.map_msg.info.width]
+            #rospy.loginfo("------- occupancy_value is  {} ----------------".format(occupancy_value ))
 
 
     def path_planner_callback(self, data):     
@@ -164,6 +206,92 @@ class ComputeEntropy(object):
 
     def mapcallback(self,mapdata):
         self.map_msg = mapdata
+
+        global map_data, map_resolution, map_origin, map_width, map_height
+        map_data = np.array(self.map_msg.data, dtype=np.int8).reshape(self.map_msg.info.height, self.map_msg.info.width)
+        map_resolution = self.map_msg.info.resolution
+        map_origin = (self.map_msg.info.origin.position.x, self.map_msg.info.origin.position.y)
+        map_width = mapdata.info.width
+        map_height = mapdata.info.height        
+
+
+    def get_map_cell(self,point):
+        """ Convert a point in the world coordinates to a cell in the occupancy grid map """        
+        cell_x = int((point.x - map_origin[0]) / map_resolution)
+        cell_y = int((point.y - map_origin[1]) / map_resolution)
+        return (cell_x, cell_y)
+
+    def ray_tracing(self,start_point, end_point):
+        """ Perform ray tracing from start_point to end_point """
+        start_cell = self.get_map_cell(start_point)
+        end_cell = self.get_map_cell(end_point)
+        ray_cells = []
+        x0, y0 = start_cell
+        x1, y1 = end_cell       
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        
+        x = x0
+        y = y0
+        n = 1 + dx + dy
+        x_inc = 1 if x1 > x0 else -1
+        y_inc = 1 if y1 > y0 else -1
+        error = dx - dy
+        dx *= 2
+        dy *= 2
+        while n > 0:
+            ray_cells.append((x, y))
+            if error >= 0:
+                x += x_inc
+                error -= dy
+            else:
+                y += y_inc
+                error += dx
+            n -= 1 
+        occupancy_values = [map_data[cell[0], cell[1]] for cell in ray_cells]       
+        return ray_cells,occupancy_values         
+    
+
+    def draw_ray_on_map(self,ray_cells):
+        """ Draw the ray on the occupancy grid map """
+        global map_data
+        new_map_data = np.copy(map_data)
+        for cell in ray_cells:
+            if cell[0] < 0 or cell[0] >= map_width or cell[1] < 0 or cell[1] >= map_height:
+                continue
+            new_map_data[cell[1], cell[0]] = 100  # set the occupancy grid value to 100
+        return new_map_data
+    
+    def plot_map_with_markers(self,map_data):
+        """ Plot the occupancy grid map with Markers """
+        global map_resolution, map_origin
+        marker_pub = rospy.Publisher('/visualization_marker2', Marker, queue_size=10)
+        marker_msg = Marker()
+        marker_msg.header.frame_id = 'map'
+        marker_msg.type = Marker.CUBE_LIST
+        marker_msg.action = Marker.ADD
+        marker_msg.pose.orientation.w = 1.0
+        marker_msg.scale.x = map_resolution
+        marker_msg.scale.y = map_resolution
+        marker_msg.scale.z = map_resolution
+        for y in range(map_data.shape[0]):
+            for x in range(map_data.shape[1]):
+                if map_data[y, x] == 100:  # occupied cell
+                    p = Point()
+                    p.x = x * map_resolution + map_origin[0]
+                    p.y = y * map_resolution + map_origin[1]
+                    p.z = 0
+                    marker_msg.points.append(p)
+                    marker_msg.colors.append(ColorRGBA(0.5, 0.5, 0.5, 1.0))  # gray color
+                elif map_data[y, x] == 0:  # free cell
+                    p = Point()
+                    p.x = x * map_resolution + map_origin[0]
+                    p.y = y * map_resolution + map_origin[1]
+                    p.z = 0
+                    marker_msg.points.append(p)
+                    marker_msg.colors.append(ColorRGBA(1.0, 1.0, 1.0, 1.0))  # white color
+        marker_pub.publish(marker_msg)
+        
        
     def compute_path_entropy(self,pathmatrix,frontierID,frontierposx, frontierposy):        
         self.markerArray = MarkerArray()
@@ -199,9 +327,8 @@ class ComputeEntropy(object):
                         #marker.id= 1
                         #self.marker_pub.publish(marker)
                         #prob = 0.5
-                    elif occupancy_value == 0:
+                    elif occupancy_value == 0 or occupancy_value == 100:
                         prob=0.450 #yields high entropy and low uncertinaty and high information gain
-  
                     else:
                         rospy.loginfo("I got a different occupancy value of {}".format(occupancy_value))
                         rospy.loginfo("at location {},{}".format(i,j))                                    
@@ -243,11 +370,13 @@ class ComputeEntropy(object):
                                
     def frontiercallback(self,data):
         markerArray = MarkerArray()
+        marker = Marker()
+
         Froniter_Pose = Pose()
         frontier_plan = data   
         frontier_plan.totalfrontiers  
         path_length = len(frontier_plan.waypoints)
-
+        frontier_plan.robotxy_pos.x 
 
         #rospy.loginfo("frontier_plan.robotxy_pos.x = {}".format(frontier_plan.robotxy_pos.x))
         #rospy.loginfo("frontier_plan.robotxy_pos.y = {}".format(frontier_plan.robotxy_pos.y))
@@ -259,7 +388,7 @@ class ComputeEntropy(object):
         #
         #rospy.loginfo(" -------- Path length is ----------= {} ".format(path_length ))
 
-        posematrix = arr = np.zeros((2, int(path_length)))
+        posematrix =  np.zeros((2, int(path_length)))
         rr,cc = np.shape(posematrix) 
         #rospy.loginfo(" --------------Got frointier with ID = {} --- and name {} ----------------".format(self.frontier_plan.ID, self.frontier_plan.name))
         #rospy.loginfo(" -------- I will process plan for  ----------= {} frontiers".format(self.frontier_plan.totalfrontiers))
@@ -274,10 +403,9 @@ class ComputeEntropy(object):
                 Froniter_Pose.position.y=frontier_plan.waypoints[i].position.y
                 posematrix[0,i]=Froniter_Pose.position.x
                 posematrix[1,i]=Froniter_Pose.position.y
-
                 marker = self.draw_marker(Froniter_Pose.position.x,Froniter_Pose.position.y, [1,0.5,0.6],"cube",0.2)
-                marker.id= i                
-                markerArray.markers.append(marker)
+                #marker.id= i                
+                #markerArray.markers.append(marker)
                 
                 #self.draw_marker(self.Froniter_Pose.position.x,self.Froniter_Pose.position.y,[0.0,10.0,0.0], "sphere",10 )
             self.savetofile(posematrix,frontier_plan.ID)
@@ -296,7 +424,7 @@ class ComputeEntropy(object):
         #def draw_marker(self,x, y, color=[1.0,0.0,0.0], mtype="sphere", scale=0.1, ns='my_marker_ns'):
         marker = self.draw_marker(frontier_plan.frontier_loc.x,frontier_plan.frontier_loc.y, [0.5,0.5,1],"sphere", 0.5)        
         self.marker_pub.publish(marker)
-        self.markerArray_pub.publish(markerArray)
+        #self.markerArray_pub.publish(markerArray)
        
 
     def callback(self, frontier):

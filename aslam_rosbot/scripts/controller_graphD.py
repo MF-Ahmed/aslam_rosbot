@@ -367,6 +367,10 @@ def node():
             frontiermsg2=FrontierWithPath()
             frontiermsg2.chosenfrontierxy_pos.x= centroid_record[winner_id][0]
             frontiermsg2.chosenfrontierxy_pos.y= centroid_record[winner_id][1]
+            
+            frontiermsg2.robotxy_pos.x = initial_plan_position[0] 
+            frontiermsg2.robotxy_pos.y  = initial_plan_position[1] 
+            
             chosen_frontier_pub_.publish(frontiermsg2) 
             #rospy.loginfo("winner frontier loc is = {}".format(centroid_record[winner_id]))
             robot_.sendGoal(centroid_record[winner_id])
