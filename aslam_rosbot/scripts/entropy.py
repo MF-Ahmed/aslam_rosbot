@@ -13,8 +13,10 @@ from aslam_rosbot.msg import FrontierWithPath
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import String
 from nav_msgs.msg import Path, OccupancyGrid
-from functions import createMarker
+from functions import *
 from constants import csv_path_1, csv_path_2, csv_path_3
+from bresenham import bresenham
+#from occupancy_grid_utils.ray_trace import bresenham2D
 
 
 
@@ -95,8 +97,58 @@ class ComputeEntropy(object):
     def chosenfrontiercallback(self, data):
         self.chosenfrontier_posx = data.chosenfrontierxy_pos.x   
         self.chosenfrontier_posy = data.chosenfrontierxy_pos.y  
+        marker_pos_x = -0.5
+        marker_pos_y = 5   
+
+        marker_posd_x = -0.5
+        marker_posd_y = -5   
+        
+        #index_of_point()
+        #point_of_index()
+        markerArray = MarkerArray()
+
+        points = bresenham(self.map_msg.data, marker_pos_x, marker_pos_y, marker_posd_x, marker_posd_y)
+        rospy.loginfo("I got {} points from Breshenam ".format(len(points[0])))        
+        rospy.loginfo("{}  from breshnam ".format(points[0][0] ))
+        rospy.loginfo("{}  from breshnam ".format(points[1][0] ))
+        rospy.loginfo("{}  from breshnam ".format(points[0][1] ))
+        rospy.loginfo("{}  from breshnam ".format(points[1][1] ))         
+        
+        marker = self.draw_marker(points[0][0],points[1][0], [0.2,0.5,0.7],"cube",0.5)
+        marker.id= 1                
+        markerArray.markers.append(marker)  
+        marker = self.draw_marker(points[0][1],points[1][1] ,[0.2,0.5,0.7],"cube",0.5)
+        marker.id= 2                
+        markerArray.markers.append(marker)          
+        marker = self.draw_marker(points[0][2],points[1][2], [0.2,0.5,0.7],"cube",0.5)
+        marker.id= 3                
+        markerArray.markers.append(marker)          
+        marker = self.draw_marker(points[0][3],points[1][3] ,[0.2,0.5,0.7],"cube",0.5)
+        marker.id= 4                
+        markerArray.markers.append(marker)    
+        self.markerArray_pub.publish(markerArray)                                                   
+
+
+
+        for x in points:
+            rospy.loginfo("{}  from breshnam zip ".format(x))
+
+            
+        
+
+
         marker = Marker()
-        marker = self.draw_marker(self.chosenfrontier_posx,self.chosenfrontier_posy, [0.5,0.5,1],"cube",0.3)         
+        marker = self.draw_marker(marker_pos_x,marker_pos_y, [0.5,0.5,1],"cube",0.5)  
+        i = int((marker_pos_x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        j = int((marker_pos_y- self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
+        if i >= 0 and i < self.map_msg.info.width and j >= 0 and j < self.map_msg.info.height:
+        # Extract the occupancy value at the desired location
+        #rospy.loginfo("i  = {}".format(i))
+        #rospy.loginfo("j  = {}".format(j))
+            occupancy_value = self.map_msg.data[i + j * self.map_msg.info.width]
+            rospy.loginfo("------- occupancy_value is  {} ----------------".format(occupancy_value ))
+
+
         self.marker_pub.publish(marker)
 
 
@@ -195,6 +247,8 @@ class ComputeEntropy(object):
         frontier_plan = data   
         frontier_plan.totalfrontiers  
         path_length = len(frontier_plan.waypoints)
+
+
         #rospy.loginfo("frontier_plan.robotxy_pos.x = {}".format(frontier_plan.robotxy_pos.x))
         #rospy.loginfo("frontier_plan.robotxy_pos.y = {}".format(frontier_plan.robotxy_pos.y))
         

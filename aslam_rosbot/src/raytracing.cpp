@@ -72,7 +72,7 @@ void mapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
 
 int main(int argc, char** argv) {
     // Initialize the ROS node
-    ros::init(argc, argv, "my_node_name");
+    ros::init(argc, argv, "raytracing");
 
     // Create a NodeHandle object for the node
     ros::NodeHandle nh;

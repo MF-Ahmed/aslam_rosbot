@@ -59,7 +59,11 @@ def frontiersCallBack(data):
 def mapCallBack(data):
     global map_data_
     map_data_ = data
-
+    #rospy.loginfo("I got the Map data as ={}".format(data.data))
+    # occupancy likelihood
+    # 0 = free
+    # 100 = occupied
+    # -1 = unknown
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Functions~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
