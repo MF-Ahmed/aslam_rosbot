@@ -104,11 +104,7 @@ class ComputeEntropy(object):
         marker_pos_x = int(self.frontier_plan.robotxy_pos.x)
         marker_pos_y = int(self.frontier_plan.robotxy_pos.y)   
 
-        #new_map_data = self.draw_ray_on_map(ray_cells)
-        #rospy.loginfo("------- new_map_data ----------------{}".format(new_map_data)) 
-        #rospy.loginfo("------- new_map_data shape is {} ".format(new_map_data.shape)) 
-                #self.plot_map_with_markers(map_data)
-         
+
 
         #print('Ray cells:', ray_cells)
         
@@ -162,14 +158,8 @@ class ComputeEntropy(object):
             #rospy.loginfo("------- occupancy_value is  {} ----------------".format(occupancy_value ))
 
 
-    def path_planner_callback(self, data):     
-       
+    def path_planner_callback(self, data):   
         pass
-        #rospy.loginfo("in path callback")
-        #rospy.loginfo("Path format is  = {}".format(data))        
-        #print([x.pose.position.x for x in data.poses])
-        #print([y.pose.position.y for y in data.poses])
-        # Your path planning code goes here
 
     def mapcallback(self,mapdata):
         self.map_msg = mapdata
@@ -180,21 +170,10 @@ class ComputeEntropy(object):
         map_origin = (self.map_msg.info.origin.position.x, self.map_msg.info.origin.position.y)
         map_width = mapdata.info.width
         map_height = mapdata.info.height  
-        #rospy.loginfo("map_origin = {}".format(map_origin))
-        #rospy.loginfo("map_widt = {}".format(map_width))
-        #rospy.loginfo("map_height = {}".format(map_height))
-
-
-        marker = Marker()
-        marker = self.draw_marker(map_origin[0],map_origin[1], [0.7,0.7,1],"sphere", 2)  
-        marker.id= 0
-        self.marker_pub.publish(marker) 
 
 
     def get_map_cell(self,point):
-        """ Convert a point in the world coordinates to a cell in the occupancy grid map """  
-        
-
+        """ Convert a point in the world coordinates to a cell in the occupancy grid map """       
         cell_x = int((point.x - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
         cell_y = int((point.y - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)
         return (cell_x, cell_y)
@@ -231,23 +210,15 @@ class ComputeEntropy(object):
         #if i >= 0 and i < self.map_msg.info.width and j >= 0 and j < self.map_msg.info.height:         
         #rospy.loginfo("map_data = {}".format(len(map_data)))
         #rospy.loginfo("ray_cells = {}".format(len(ray_cells)))
-        try:
-            for cell in ray_cells:
-                if cell[0] >= 0 and cell[0] < map_width and cell[1] >= 0 and cell[1] < map_height:                           
-                    occupancy_values.append([map_data[cell[0], cell[1]]]) #= [map_data[cell[0], cell[1]]]
-        except Exception as e:  
-            rospy.logerr("problem computing the occupancy {}".format(e))                                        
-        return ray_cells,occupancy_values
+
+        #try:   
+            #for cell in ray_cells:
+                #if cell[0] >= 0 and cell[0] < self.map_msg.info.width and cell[1] >= 0 and cell[1] < self.map_msg.info.height:                           
+                    #occupancy_values.append([map_data[cell[0], cell[1]]]) #= [map_data[cell[0], cell[1]]]
+        #except Exception as e:  
+            #rospy.logerr("problem computing the occupancy {}".format(e))  
+        return ray_cells
     
-    def draw_ray_on_map(self,ray_cells):
-        """ Draw the ray on the occupancy grid map """
-        global map_data
-        new_map_data = np.copy(map_data)
-        for cell in ray_cells:
-            if cell[0] < 0 or cell[0] >= map_width or cell[1] < 0 or cell[1] >= map_height:
-                continue
-            new_map_data[cell[1], cell[0]] = 100  # set the occupancy grid value to 100
-        return new_map_data
     
     def getrobotposition(self):
         self.listener = tf.TransformListener()   
@@ -275,10 +246,29 @@ class ComputeEntropy(object):
 
         start_point = Point( robot_position[0] ,  robot_position[1] , 0)
         end_point = Point( frontier_plan.frontier_loc.x , frontier_plan.frontier_loc.y, 0)
-        ray_cells,occupency_values = self.ray_tracing(start_point, end_point)        
+        ray_cells = self.ray_tracing(start_point, end_point)  
 
-        #rospy.loginfo("------- ray_cells ----------------{}".format(ray_cells)) 
-        rospy.loginfo("------- No. of ray_cells  ----------------{}".format(len(ray_cells)))
+        markerArray = MarkerArray()
+        marker=Marker()
+        marker.id=0        
+        occupency_values =[]
+        map_res = self.map_msg.info.resolution        
+        map_orig_x_loc = self.map_msg.info.origin.position.x 
+        map_orig_y_loc = self.map_msg.info.origin.position.y    
+
+        for i in range(0,len(ray_cells)):
+            x = ray_cells[i][0]
+            y = ray_cells[i][1]   
+            X_w = self.map_msg.info.origin.position.x + x*self.map_msg.info.resolution  
+            Y_w = self.map_msg.info.origin.position.y + y*self.map_msg.info.resolution                
+            Xp =[X_w,Y_w]
+            marker = self.draw_marker((ray_cells[i][0]*map_res) +map_orig_x_loc ,(ray_cells[i][1]*map_res)+map_orig_y_loc , [0.4,0.1,0.5],"sphere", 0.1)                  
+            marker.id = i       
+            markerArray.markers.append(marker)  
+            occupency_values.append(gridValue(self.map_msg, Xp)) 
+        self.markerArray_pub.publish(markerArray)         
+        
+
 
         markerArray = MarkerArray()
         map_res = self.map_msg.info.resolution        
@@ -287,52 +277,43 @@ class ComputeEntropy(object):
         marker=Marker()
         marker.id=0
 
-        robot_pos_x_pixls = int((frontier_plan.robotxy_pos.x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
-        robot_pos_y_pixls = int((frontier_plan.robotxy_pos.y- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        #robot_pos_x_pixls = int((frontier_plan.robotxy_pos.x- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        #robot_pos_y_pixls = int((frontier_plan.robotxy_pos.y- self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
 
 
-        for i in range(0,len(ray_cells)):#, int(len(ray_cells[0])/10)):
-            marker = self.draw_marker((ray_cells[i][0]*map_res) +map_orig_x_loc ,(ray_cells[i][1]*map_res)+map_orig_y_loc , [0.4,0.1,0.5],"sphere", 0.1)                  
-            marker.id = i       
-            markerArray.markers.append(marker)       
-  
+        #for i in range(0,len(ray_cells)):#, int(len(ray_cells[0])/10)):
+            #marker = self.draw_marker((ray_cells[i][0]*map_res) +map_orig_x_loc ,(ray_cells[i][1]*map_res)+map_orig_y_loc , [0.4,0.1,0.5],"sphere", 0.1)                  
+            #marker.id = i       
+            #markerArray.markers.append(marker)  
+        #self.markerArray_pub.publish(markerArray)       
 
-        self.markerArray_pub.publish(markerArray)
-        
-
+        robot_position = self.getrobotposition()
 
         frontierposx= int((frontier_plan.frontier_loc.x  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
         frontierposy= int((frontier_plan.frontier_loc.y  - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)     
 
-        robotposx= int((frontier_plan.robotxy_pos.x  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
-        robotposy= int((frontier_plan.robotxy_pos.y  - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
+        robotposx= int((robot_position[0]  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        robotposy= int((robot_position[1] - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
 
-        #rospy.loginfo("Robot is at {},{}".format(robotposx ,  robotposx ))
-        #rospy.loginfo("Frontier is at {},{}".format(frontierposx ,  frontierposy ))
-        rospy.loginfo("Distance between the robot and Frontier is {}".format(self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy)))        
-     
-        #occupancy_values = [map_data[cell[0], cell[1]] for cell in range(0, len(ray_cells))]       
-        
-        #rospy.loginfo("------- occupency_values is ----------------{}".format(occupency_values)) 
-        rospy.loginfo("------- No. of occupency_values ----------------{}".format(len(occupency_values))) 
+        rospy.loginfo("Distance between the Robot and Frontier in pixels  is {}".format(self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy)))        
+                
         occupancy_list = []
 
         try: 
            for occupancy_value in occupency_values:   
-                occupancy_list.append(occupancy_value[0])                            
-                if occupancy_value[0] == -1:
+                occupancy_list.append(occupancy_value)                            
+                if occupancy_value == -1:
                     prob=0.100  # yeilds low entropy and high uncertinaty and low information gain
-                elif occupancy_value[0] == 0 or occupancy_value[0] == 100:
+                elif occupancy_value == 0 or occupancy_value == 100:
                     prob=0.450 #yields high entropy and low uncertinaty and high information gain
                 else:
                     rospy.loginfo("I got a different occupancy value of {}".format(occupancy_value))                               
                 try:                        
                     entropy +=  (-((prob * math.log2(prob) + (1 - prob)*math.log2(1 - prob)))) #* np.exp(-0.25 *  self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy))     
-                    #entropy =  entropy/np.exp(-0.25 *  self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy))               
+                    entropy = entropy/len(occupency_values)
                 except Exception as e:                        
                     rospy.logerr("problem computing the entropy {}".format(e))                
             # Do something with the occupancy value         
-        #rospy.loginfo("Occupancy value at ({}, {}): {}".format(x, y, self.occupancy_value))
         except Exception as e:
             rospy.logerr("Error processing compute entropy method: {}".format(e))
 
@@ -383,8 +364,8 @@ class ComputeEntropy(object):
         #
         #rospy.loginfo(" -------- Path length is ----------= {} ".format(path_length ))
 
-        posematrix =  np.zeros((2, int(path_length)))
-        rr,cc = np.shape(posematrix) 
+        #posematrix =  np.zeros((2, int(path_length)))
+        #rr,cc = np.shape(posematrix) 
         #rospy.loginfo(" --------------Got frointier with ID = {} --- and name {} ----------------".format(self.frontier_plan.ID, self.frontier_plan.name))
         #rospy.loginfo(" -------- I will process plan for  ----------= {} frontiers".format(self.frontier_plan.totalfrontiers))
         #plan[i].pose.position.x
@@ -404,27 +385,16 @@ class ComputeEntropy(object):
         #rospy.loginfo("Got frontier at pos x = {}".format(self.frontier_plan.frontier_loc.x))
         #rospy.loginfo("Got frontier at pos y = {}".format(self.frontier_plan.frontier_loc.y))
         #def draw_marker(self,x, y, color=[1.0,0.0,0.0], mtype="sphere", scale=0.1, ns='my_marker_ns'):
-        marker = self.draw_marker(frontier_plan.frontier_loc.x,frontier_plan.frontier_loc.y, [0.5,0.5,1],"sphere", 0.5)        
+        marker = self.draw_marker(frontier_plan.frontier_loc.x,frontier_plan.frontier_loc.y, [0.5,0.5,1],"sphere", 0.7)        
         self.marker_pub.publish(marker)
         #self.markerArray_pub.publish(markerArray)
        
 
     def callback(self, frontier):
         pass
-        #rospy.loginfo("in frontier callback")
-        #for i in range(0,len(frontier.points)):
-            #pass #rospy.loginfo("\n\r got froniter {} at = {}".format(i, frontier.points[i]))
-      
-        #plan_service = rospy.get_param('~plan_service', '/move_base_node/NavfnROS/make_plan')
-    #rospy.wait_for_service(plan_service)
-    
 
-    #
-    
-    # spin() simply keeps python from exiting until this node is stopped
     
     
-
 if __name__ == '__main__':
     try:
         rospy.init_node('entropy', anonymous=True)
@@ -432,15 +402,4 @@ if __name__ == '__main__':
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
-
-
-''''
-double prob = int(latest_map_msg_.data.at(id));
-    prob == -1 ? prob = 50 : prob;
-    prob == 0 ? prob = 0.00000000001 : (prob == 100 ? prob = 0.999999999 : prob = prob /
-                                                                                100.0);
-    entropy[cost] +=
-            -(prob * std::log2(prob) + (1 - prob) * std::log2(1 - prob)) *
-            std::exp(-0.25 * (dist));
-'''
 
