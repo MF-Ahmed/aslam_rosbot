@@ -350,8 +350,7 @@ bool MapExtract::getBestPathServiceCallback(aslam_rosbot::get_best_path::Request
                             int id = 0;//mapIndexToId(submap_id.at(0), submap_id.at(1), map_width_);
                             double prob = int(latest_map_msg_.data.at(id));
                             prob == -1 ? prob = 50 : prob;
-                            prob == 0 ? prob = 0.00000000001 : (prob == 100 ? prob = 0.999999999 : prob = prob /
-                                                                                                          100.0);
+                            prob == 0 ? prob = 0.00000000001 : (prob == 100 ? prob = 0.999999999 : prob = prob /100.0);
                             entropy[cost] +=
                                     -(prob * std::log2(prob) + (1 - prob) * std::log2(1 - prob)) *
                                     std::exp(-0.25 * (dist));
