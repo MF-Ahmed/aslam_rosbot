@@ -262,36 +262,7 @@ class ComputeEntropy(object):
             new_map_data[cell[1], cell[0]] = 100  # set the occupancy grid value to 100
         return new_map_data
     
-    def plot_map_with_markers(self,map_data):
-        """ Plot the occupancy grid map with Markers """
-        global map_resolution, map_origin
-        marker_pub = rospy.Publisher('/visualization_marker2', Marker, queue_size=10)
-        marker_msg = Marker()
-        marker_msg.header.frame_id = 'map'
-        marker_msg.type = Marker.CUBE_LIST
-        marker_msg.action = Marker.ADD
-        marker_msg.pose.orientation.w = 1.0
-        marker_msg.scale.x = map_resolution
-        marker_msg.scale.y = map_resolution
-        marker_msg.scale.z = map_resolution
-        for y in range(map_data.shape[0]):
-            for x in range(map_data.shape[1]):
-                if map_data[y, x] == 100:  # occupied cell
-                    p = Point()
-                    p.x = x * map_resolution + map_origin[0]
-                    p.y = y * map_resolution + map_origin[1]
-                    p.z = 0
-                    marker_msg.points.append(p)
-                    marker_msg.colors.append(ColorRGBA(0.5, 0.5, 0.5, 1.0))  # gray color
-                elif map_data[y, x] == 0:  # free cell
-                    p = Point()
-                    p.x = x * map_resolution + map_origin[0]
-                    p.y = y * map_resolution + map_origin[1]
-                    p.z = 0
-                    marker_msg.points.append(p)
-                    marker_msg.colors.append(ColorRGBA(1.0, 1.0, 1.0, 1.0))  # white color
-        marker_pub.publish(marker_msg)
-        
+          
        
     def compute_path_entropy(self,pathmatrix,frontierID,frontierposx, frontierposy):        
         self.markerArray = MarkerArray()
