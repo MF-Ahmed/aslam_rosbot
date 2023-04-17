@@ -39,11 +39,11 @@
     <param name="rate" value="25.0" />
   </node>
 
-  <node name="map_extract" pkg="aslam_rosbot" type="map_extract_node" output="screen" respawn="true">
-    <!-- <rosparam file="$(find robotino_simulations)/config/camera.yaml" command="load"/> -->
+   <!-- <node name="map_extract" pkg="aslam_rosbot" type="map_extract_node" output="screen" respawn="true">
+    
     <param name="prob_threshold_free"  value="70"/>
     <param name="debug" value="false"/>
-  </node>
+  </node> -->
 
   <node name="entropy" pkg="aslam_rosbot" type="entropy.py" output="screen" respawn="true">
 

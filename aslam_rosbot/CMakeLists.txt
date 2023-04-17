@@ -69,13 +69,13 @@ include
 ${catkin_INCLUDE_DIRS})
 
 # Executables
-add_executable(map_extract_node src/map_extract.cpp)
+#add_executable(map_extract_node src/map_extract.cpp)
 
 # Dependencies
-add_dependencies(map_extract_node aslam_rosbot_generate_messages_cpp)
+#add_dependencies(map_extract_node aslam_rosbot_generate_messages_cpp)
 
 # Link libraries
-target_link_libraries(map_extract_node ${catkin_LIBRARIES})
+#target_link_libraries(map_extract_node ${catkin_LIBRARIES})
 ########################
 
 add_executable(d_opt_global_rrt_detector src/global_rrt_detector.cpp src/functions.cpp src/mtrand.cpp)
@@ -84,8 +84,8 @@ target_link_libraries(d_opt_global_rrt_detector ${catkin_LIBRARIES})
 add_executable(d_opt_local_rrt_detector src/local_rrt_detector.cpp src/functions.cpp src/mtrand.cpp)
 target_link_libraries(d_opt_local_rrt_detector ${catkin_LIBRARIES})
 
-add_executable(entropy src/entropy.cpp)
-target_link_libraries(entropy ${catkin_LIBRARIES})
+#add_executable(entropy src/entropy.cpp)
+#target_link_libraries(entropy ${catkin_LIBRARIES})
 
 add_executable(raytracing src/raytracing.cpp )
 target_link_libraries(raytracing ${catkin_LIBRARIES})

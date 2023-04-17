@@ -34,11 +34,12 @@ bool rayTrace(float start_x, float start_y, float end_x, float end_y, const nav_
     int sx = (start_i < end_i) ? 1 : -1;
     int sy = (start_j < end_j) ? 1 : -1;
     int err = dx - dy;
+
     while (true) {
         // Check if the current cell is occupied
         //if (isOccupied(start_i, start_j, map.info.width, map.data)) {
         //    return false; // Obstacle detected, ray is obstructed
-        //}
+       // }
         // Check if we've reached the end point
         if (start_i == end_i && start_j == end_j) {
             return true; // End point reached, ray is unobstructed

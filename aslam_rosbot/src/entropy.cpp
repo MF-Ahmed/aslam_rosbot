@@ -1,3 +1,8 @@
+
+
+
+
+
 #include <iostream>
 #include <vector>
 #include <map_extract.h>
@@ -5,7 +10,7 @@
 #include <numeric>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "aslam_rosbot/PointArray.h"
+//#include "aslam_rosbot/PointArray.h"
 /*
 
 iRotate Active Visual SLAM for Omnidirectional Robots
@@ -407,6 +412,5 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
 
 
