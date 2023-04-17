@@ -317,6 +317,9 @@ def createMarker(mtype: str = "point", frame: str = "/map", ns: str = "marker_ns
     return marker
 
 
+
+
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def cellInformation(mapData, point, r):
     cells = [0, 0, 0]  # every cell, unknown cells, occupied cells

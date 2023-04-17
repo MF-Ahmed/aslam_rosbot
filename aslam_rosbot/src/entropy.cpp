@@ -5,7 +5,7 @@
 #include <numeric>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "aslam_rosbot/PointArray.h"
+//#include "aslam_rosbot/PointArray.h"
 /*
 
 iRotate Active Visual SLAM for Omnidirectional Robots

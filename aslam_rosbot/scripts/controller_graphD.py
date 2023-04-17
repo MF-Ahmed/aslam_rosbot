@@ -98,33 +98,7 @@ def hallucinateGraph(G, p_frontier, info_radius):
     #rospy.loginfo("################ plan to the chosen frontier ################" + format(plan[0])) 
     #rospy.loginfo("################ plan  ################" + format(plan[0].pose.position.x)) 
    
-    frontiermsg=FrontierWithPath() 
-    robotcurrpose= robot_.getPosition() 
-    frontiermsg.robotxy_pos.x = robotcurrpose[0]
-    frontiermsg.robotxy_pos.y = robotcurrpose[1]
 
-    frontiermsg.frontier_loc.x=p_frontier[0]
-    frontiermsg.frontier_loc.y=p_frontier[1]
-    frontiermsg.frontier_loc.theta=0
-    frontiermsg.ID = forntier_ID
-    frontiermsg.name="{}st frontier".format(forntier_ID)    
-    frontiermsg.totalfrontiers = numoffrontiers
-
-    for i in range(0, len(plan)):
-        pose1 = Pose()         
-        frontiermsg.header.seq=plan[i].header.seq
-        frontiermsg.header.stamp=rospy.Time.now()
-        frontiermsg.header.frame_id="frontier frame ID"
-        pose1.position.x=plan[i].pose.position.x
-        pose1.position.y=plan[i].pose.position.y
-        pose1.position.z=plan[i].pose.position.z
-        pose1.orientation.x=0
-        pose1.orientation.y=0
-        pose1.orientation.z=0
-        pose1.orientation.w=0
-        frontiermsg.waypoints.append(pose1)
-    f_path_pub_.publish(frontiermsg)
-    
     n_points = int(len(plan))
 
     if n_points > 1:
@@ -269,7 +243,7 @@ def node():
     t_0 = rospy.get_time()
     t_f_acc_decision_making = 0
 
-     
+    frontiermsg=FrontierWithPath()      
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     while not rospy.is_shutdown():
@@ -289,6 +263,7 @@ def node():
 
         n_centroids = len(centroids) # number of frontiers seen
         numoffrontiers = len(centroids)
+        frontiermsg.totalfrontiers = numoffrontiers         
 
         rospy.loginfo("I saw {} frontiers ".format(n_centroids))
 
@@ -313,6 +288,7 @@ def node():
         elif m < 1:
             rospy.logwarn("Graph not started yet, m < 1. Selecting goal +=[0.1,0.1].")
             closer_goal = True
+
         else:  # Otherwise
             #rospy.loginfo("Computing information gain of every frontier candidate.")
             for ip in range(0, n_centroids):  ##################### change this if only if you want to chage the frontier 
@@ -321,7 +297,10 @@ def node():
 
                 # Compute hallucinated pose graph 
                 G_frontier, flag = hallucinateGraph(G, p_frontier, info_radius) # towards every frontier candidate ?
+                frontiermsg.ID = forntier_ID
+                frontiermsg.name="{}st frontier".format(forntier_ID) 
                 forntier_ID = forntier_ID + 1
+
                 if flag:
                     rospy.logerr(rospy.get_name() + ": No points in plan to frontier at " + format(p_frontier) +
                                  ". Assigning -Inf information!!")
@@ -332,9 +311,21 @@ def node():
                     L_anch = G_frontier.compute_anchored_L() # compute anchored laplacian 
                     _, t = np.linalg.slogdet(L_anch.todense()) # Compute the sign and (natural) logarithm of the determinant of an array.
                     spann = n_frontier ** (1 / n_frontier) * np.exp(t / n_frontier) # equation 42 of the journal paper
-                    rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))
-                    rospy.loginfo("=========+++++++++++++++++++++++++=========================\n\n")
                     infoGain.append(spann)
+
+                    #rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))
+                    #rospy.loginfo("=========+++++++++++++++++++++++++=========================\n\n")
+ 
+                    robotcurrpose= robot_.getPosition() 
+                    frontiermsg.robotxy_pos.x = robotcurrpose[0]
+                    frontiermsg.robotxy_pos.y = robotcurrpose[1]
+
+                    frontiermsg.frontier_loc.x=p_frontier[0]
+                    frontiermsg.frontier_loc.y=p_frontier[1]
+                    frontiermsg.frontier_loc.theta=0     
+                    frontiermsg.spanning_trees = spann
+                    f_path_pub_.publish(frontiermsg)
+                    
 
         if robot_.getState() == 1:
             t_f_acc_decision_making += rospy.get_time() - t_0_decision_making
@@ -352,7 +343,6 @@ def node():
 
             winner_id = infoGain_record.index(np.max(infoGain_record)) # winner frontier
             rospy.loginfo("========= Winner forntier ID is =  {}\n\n".format(winner_id))
-            rospy.loginfo("================+++++++++++++++++++++++++=========================\n\n")
             rospy.loginfo("================+++++++++++++++++++++++++=========================\n\n")
 
             forntier_ID = 0
