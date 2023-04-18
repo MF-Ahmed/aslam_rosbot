@@ -185,6 +185,8 @@ class ComputeEntropy(object):
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 # rospy.logerr(tf.LookupException);
                 cond = 0
+               
+
         return  robot_position       
 
 
