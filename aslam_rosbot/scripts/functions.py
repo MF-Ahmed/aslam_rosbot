@@ -2,6 +2,8 @@
 
 # jplaced@unizar.es
 # 2022, Universidad de Zaragoza
+# muhammad.ahmed@ec-nanets.fr
+# 2023 Ecole Centrale de Nantes
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Include modules~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,11 +23,15 @@ from numpy.linalg import norm
 
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.srv import GetPlan
-from geometry_msgs.msg import PoseStamped
-from visualization_msgs.msg import Marker
+from geometry_msgs.msg import PoseStamped, Point
+from visualization_msgs.msg import Marker,MarkerArray 
 
 from nptyping import ndarray
 import math
+from constants import csv_path_1, csv_path_2, csv_path_3
+from PIL import Image, ImageDraw
+import csv
+
 
 cuda.select_device(0)
 
@@ -376,3 +382,179 @@ def cellInformation_NUMBA(data, resolution, width, Xstartx, Xstarty, pointx, poi
     LC_gain = (float(cells[2]) / float(cells[0]))
 
     return unknown_area_gain, LC_gain
+
+
+def get_map_cell(mapData,point):
+    """ Convert a point in the world coordinates to a cell in the occupancy grid map """       
+    cell_x = int((point.x - mapData.info.origin.position.x) / mapData.info.resolution)
+    cell_y = int((point.y - mapData.info.origin.position.y) / mapData.info.resolution)
+    return (cell_x, cell_y)
+
+def ray_tracing(mapData,start_point, end_point):
+    """ Perform ray tracing from start_point to end_point """
+    start_cell = get_map_cell(mapData,start_point)
+    end_cell = get_map_cell(mapData,end_point)
+    ray_cells = []
+    occupancy_values=[]    
+    x0, y0 = start_cell
+    x1, y1 = end_cell       
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)    
+    x = x0
+    y = y0
+    n = 1 + dx + dy
+
+    x_inc = 1 if x1 > x0 else -1
+    y_inc = 1 if y1 > y0 else -1
+    
+    error = dx - dy
+    dx *= 2
+    dy *= 2
+    while n > 0:
+        ray_cells.append((x, y))
+        if error >= 0:
+            x += x_inc
+            error -= dy
+        else:
+            y += y_inc
+            error += dx
+        n -= 1 
+    return ray_cells
+
+
+
+def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):  
+
+    markerArray = MarkerArray()          
+    entropy=0        
+
+    start_point = Point(robotposxy[0], robotposxy[1] , 0)
+    end_point = Point( p_frontier_x,p_frontier_y, 0)
+
+    ray_cells = ray_tracing(map_data_,start_point, end_point)  
+
+    markerArray = MarkerArray()
+    marker=Marker()
+    marker.id=0        
+    occupency_values =[]
+    map_res = map_data_.info.resolution        
+    map_orig_x_loc = map_data_.info.origin.position.x 
+    map_orig_y_loc = map_data_.info.origin.position.y    
+
+    for i in range(0,len(ray_cells)):
+        x = ray_cells[i][0]
+        y = ray_cells[i][1]   
+        X_w = map_data_.info.origin.position.x + x*map_data_.info.resolution  
+        Y_w = map_data_.info.origin.position.y + y*map_data_.info.resolution                
+        Xp =[X_w,Y_w]
+        marker = draw_marker((ray_cells[i][0]*map_res) +map_orig_x_loc ,(ray_cells[i][1]*map_res)+map_orig_y_loc , [0.4,0.1,0.5],"sphere", 0.1)                  
+        marker.id = i       
+        markerArray.markers.append(marker)  
+        occupency_values.append(gridValue(map_data_, Xp)) 
+           
+    marker = draw_marker(p_frontier_x,p_frontier_y, [0.5,0.5,1],"sphere", 0.7)        
+
+    #markerArray = MarkerArray()
+    #map_res = map_data_.info.resolution        
+    #map_orig_x_loc = map_data_.info.origin.position.x 
+    #map_orig_y_loc = map_data_.info.origin.position.y
+    #marker=Marker()
+    #marker.id=0
+            
+    occupancy_list = []
+
+    try: 
+        for occupancy_value in occupency_values:   
+            occupancy_list.append(occupancy_value)                            
+            if occupancy_value == -1:
+                prob=0.100  # yeilds low entropy and high uncertinaty and low information gain
+            elif occupancy_value == 0 or occupancy_value == 100:
+                prob=0.450 #yields high entropy and low uncertinaty and high information gain
+            else:
+                rospy.loginfo("I got a different occupancy value of {}".format(occupancy_value))                               
+            try:                        
+                entropy +=  (-((prob * math.log2(prob) + (1 - prob)*math.log2(1 - prob)))) #* np.exp(-0.25 *  self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy))     
+                
+            except Exception as e:                        
+                rospy.logerr("problem computing the entropy {}".format(e))                
+        # Do something with the occupancy value         
+    except Exception as e:
+        rospy.logerr("Error processing compute entropy method: {}".format(e))
+
+    if entropy !=0 and len(occupency_values)!=0:    
+        entropy = entropy/len(occupency_values)     
+
+    return entropy,markerArray,marker 
+
+
+def savetofile(data,frontierID):
+    try:
+        with open(csv_path_1, mode='w') as file:
+            writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            rr,cc = np.shape(data)
+            writer.writerow("Frontier No. "+str(frontierID)) 
+            for i in range (0,cc):
+                pose = [str(data[0,i]),str(data[1,i])]
+                writer.writerow(pose)
+
+    except IOError as e:
+        rospy.logerr("Unable to write CSV file: %s", str(e))
+
+    finally:
+        file.close()
+
+def euclidean_distance( x1, y1, x2, y2):
+    distance = math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))        
+    return distance
+
+
+
+
+def draw_marker(x, y, color=[1.0,0.0,0.0], mtype="sphere", scale=0.1, ns='my_marker_ns'):
+    # Create a Marker message
+    #rospy.loginfo("got x at {} and y at {}".format(x,y))
+    marker = Marker()
+    marker.header.frame_id = "map"       
+    marker.header.stamp = rospy.Time.now() 
+    marker.action = marker.ADD
+    #marker.id = 0
+    marker.pose.position.x = x
+    marker.pose.position.y = y
+    marker.pose.position.z = 0
+    marker.pose.orientation.x = 0
+    marker.pose.orientation.y = 0
+    marker.pose.orientation.z = 0
+    marker.pose.orientation.w = 1
+    marker.scale.x = 0.5
+    marker.scale.y = 0.5
+    marker.scale.z = 0.5
+    marker.color.a = 1.0
+    marker.color.r = color[0]
+    marker.color.g = color[1]
+    marker.color.b = color[2]
+    marker.lifetime = rospy.Duration(1.5)
+    if mtype == "point":
+        marker.type = Marker.POINTS
+        marker.scale.x = marker.scale.y = scale
+    elif mtype == "sphere":
+        marker.type = Marker.SPHERE
+        marker.scale.x = marker.scale.y = marker.scale.z = scale  # Diameter
+    elif mtype == "arrow":
+        marker.type = Marker.ARROW
+        marker.scale.x = scale  # Arrow length
+        marker.scale.y = marker.scale.z = 0.05  # Arrow head diameter and length
+    elif mtype == "cube":
+        marker.type = Marker.CUBE
+        marker.scale.x = marker.scale.y = marker.scale.z = scale
+    elif mtype == "circumference":
+        marker.type = Marker.SPHERE
+        marker.scale.x = marker.scale.y = scale
+        marker.scale.z = 0.05
+        marker.pose.position.z = 0.0
+    elif mtype == "lines":
+        marker.type = Marker.LINE_STRIP
+        marker.pose.position.x = 0.0
+        marker.pose.position.y = 0.0
+        marker.pose.position.z = 0.0
+        marker.scale.x = scale
+    return marker

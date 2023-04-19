@@ -12,16 +12,16 @@ python_version = sys.version_info
 from constants import NMINEIG, EIG_TH
 
 def wait_enterKey():
-    input("Press Enter to continue...") if (python_version >= (3, 0)) else raw_input("Press Enter to continue...")
+    input("Press Enter to continue...") #if (python_version >= (3, 0)) else raw_input("Press Enter to continue...")
 
 def enforce_symmetry_list(A):
     A = np.array(A)
-    return np.tril(A.T) + np.triu(A, 1)
+    return np.tril(A.T) + np.triu(A, 1) # returns a lowe and upper triangular matrix of A
 
 def read_graph(options, args):
-    nodes_o = None;
-    edges_o = None;
-    edges_oo = None;
+    nodes_o = None
+    edges_o = None
+    edges_oo = None
 
     if options.graph_name != 'FRH_P_toro':
         print('Not default graph: ' + format(options.graph_name))
@@ -114,7 +114,6 @@ def build_fullFIM(graph):
                 A[(node1) * dim:(node1 + 1) * dim, (node1) * dim:(node1 + 1) * dim] += FIM
                 A[(node1) * dim:(node1 + 1) * dim, (node2) * dim:(node2 + 1) * dim] = - FIM
                 A[(node2) * dim:(node2 + 1) * dim, (node1) * dim:(node1 + 1) * dim] = - FIM
-
     diff = A - A.T
     if not np.all(np.abs(diff.data) < 1e-8):
         print("Error in build_fullFIM: Fisher Information matrix is not symmetric.")

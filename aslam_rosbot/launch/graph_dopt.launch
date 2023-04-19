@@ -45,9 +45,9 @@
     <param name="debug" value="false"/>
   </node> -->
 
-  <node name="entropy" pkg="aslam_rosbot" type="entropy.py" output="screen" respawn="true">
+   <!-- <node name="entropy" pkg="aslam_rosbot" type="entropy.py" output="screen" respawn="true">
 
-  </node>
+  </node> -->
 
 
   <node pkg="aslam_rosbot" type="filter.py" name="filter" output="screen" respawn="true" respawn_delay="3">

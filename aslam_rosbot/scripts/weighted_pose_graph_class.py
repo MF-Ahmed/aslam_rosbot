@@ -53,8 +53,7 @@ class weighted_pose_graph:
                 n = np.size(A, 1)
                 if criteria == 'd_opt':
                     opt_cri = np.exp(np.sum(np.log(eigv)) / n)
-
-                    #rospy.loginfo("The D opyimality of each edge graph = {}".format(opt_cri/np.size(nodes, 0))) # Farhan
+                    rospy.loginfo("The D opyimality of each edge in graph = {}".format(opt_cri)) # Farhan
 
                 else:
                     opt_cri = 0
@@ -259,7 +258,7 @@ class weighted_pose_graph:
             p1 = [(pose_current[0] + laser_range), pose_current[1]]
             p2 = [(pose_current[0] - laser_range), pose_current[1]]
             p3 = [pose_current[0], (pose_current[1] + laser_range)]
-            p4 = [(pose_current[0] + laser_range*np.cos(0.785398)), (pose_current[1] + laser_range*np.sin(0.785398))]
+            p4 = [(pose_current[0] + laser_range*np.cos(0.785398)), (pose_current[1] + laser_range*np.sin(0.785398))]  # angle is pi/4 
             p5 = [(pose_current[0] - laser_range*np.sin(0.785398)), (pose_current[1] + laser_range*np.cos(0.785398))]
             polygon_tmp = Polygon([pose_current, p1, p4, p3, p5, p2])
             polygon1 = affinity.rotate(polygon_tmp, theta_current, origin=(pose_current[0], pose_current[1]),
@@ -273,7 +272,7 @@ class weighted_pose_graph:
                 p1 = [(pose_neigh[0] + laser_range), pose_neigh[1]]
                 p2 = [(pose_neigh[0] - laser_range), pose_neigh[1]]
                 p3 = [pose_neigh[0], (pose_neigh[1] + laser_range)]
-                p4 = [(pose_neigh[0] + laser_range*np.cos(0.785398)), (pose_neigh[1] + laser_range*np.sin(0.785398))]
+                p4 = [(pose_neigh[0] + laser_range*np.cos(0.785398)), (pose_neigh[1] + laser_range*np.sin(0.785398))] # angle is pi/4 
                 p5 = [(pose_neigh[0] - laser_range*np.sin(0.785398)), (pose_neigh[1] + laser_range*np.cos(0.785398))]
                 polygon_tmp = Polygon([pose_neigh, p1, p4, p3, p5, p2])
                 polygon2 = affinity.rotate(polygon_tmp, theta_neigh, origin=(pose_neigh[0], pose_neigh[1]),

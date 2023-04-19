@@ -16,6 +16,7 @@ class weighted_pose_graph:
     def __init__(self, nodes=None, edges=None, criteria='d_opt'):
         self.graph = nx.Graph()
         if (nodes is not None) and (edges is not None):
+
             for i in range(0, np.size(nodes, 0)):
                 p = [nodes[i][1], nodes[i][2], nodes[i][3]]
                 self.graph.add_node(nodes[i][0], pose=p, theta=nodes[i][3])
@@ -27,7 +28,9 @@ class weighted_pose_graph:
                      [I[1], I[3], I[4]],
                      [I[2], I[4], I[5]]]
                 A = ut.enforce_symmetry_list(A)
-                eigv2 = scipy.linalg.eigvalsh(A)
+
+                eigv2 = np.linalg.eigvals(A)
+                #eigv2 = scipy.linalg.eigvalsh(A)
                 eigv = eigv2[eigv2 > EIG_TH]
                 n = np.size(A, 1)
                 if criteria == 'd_opt':
@@ -45,7 +48,9 @@ class weighted_pose_graph:
     def compute_anchored_L(self):
         L = nx.laplacian_matrix(self.graph, weight='weight')
         idx_to_drop = np.random.randint(0, np.shape(L)[1], 1)
+        # convert a sparse  matrix to a coordinate format
         C = L.tocoo()
+
         keep = ~np.in1d(C.col, idx_to_drop)
         C.data, C.row, C.col = C.data[keep], C.row[keep], C.col[keep]
         C.col -= idx_to_drop.searchsorted(C.col)

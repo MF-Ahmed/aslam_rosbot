@@ -19,10 +19,10 @@ from copy import deepcopy
 
 from constants import GRAPH_PATH_, PLAN_POINT_TH_, EXPLORING_TIME_, USE_GPU_, SHOW_DEBUG_PATH_, ODOM_COV_
 
-from functions import robot, wait_enterKey, getGraph
+from functions import robot, wait_enterKey, getGraph, compute_entropy,createMarker, draw_marker
 from weighted_pose_graph_class import weighted_pose_graph
 from aslam_rosbot.msg import PointArray
-from geometry_msgs.msg import PoseStamped, Pose
+from geometry_msgs.msg import PoseStamped, Pose, Point
 
 from visualization_msgs.msg import Marker, MarkerArray
 import matplotlib.pyplot as plt
@@ -100,13 +100,6 @@ def hallucinateGraph(G, p_frontier, info_radius):
     # Hallucinate path
     plan = Path()
     plan = robot_.makePlan(robot_.getPosition(), p_frontier)
- 
-
-    ### send this plan over the new topic ####
-    #rospy.loginfo("################ The  chosen frontier ################" + format(p_frontier)) 
-    #rospy.loginfo("################ plan to the chosen frontier ################" + format(plan[0])) 
-    #rospy.loginfo("################ plan  ################" + format(plan[0].pose.position.x)) 
-   
 
     n_points = int(len(plan))
 
@@ -122,11 +115,11 @@ def hallucinateGraph(G, p_frontier, info_radius):
         # wait_enterKey()
         for i in new_nodes:
             p_path = np.array([plan[i].pose.position.x, plan[i].pose.position.y])
-            th_path = np.arctan2(p_path[1] - p_last[1], p_path[0] - p_last[0])
+            th_path = np.arctan2(p_path[1] - p_last[1], p_path[0] - p_last[0])  
+            #atan2(y,x) gives you the angle between the x-axis and the vector (x,y),           
 
             id_new += 1
             G_frontier.graph.add_node(id_new, pose=p_path, theta=th_path)
-
             last_Info = G_frontier.graph.edges([id_last], 'information')
 
             try:
@@ -167,11 +160,12 @@ def hallucinateGraph(G, p_frontier, info_radius):
                         I = np.array(list(last_known_Info)[0][2])
                         # I2 = np.array(list(last_Info)[0][2])
                         for j in LC_candidates:
-                            #rospy.loginfo("found loop closure candidate")
+                            rospy.loginfo("found loop closure candidate")
                             # if np.random.random() > LC_info_i:
-                            loop_diff = np.abs(j-id_new)/G_frontier.get_no_nodes()
+                            loop_diff = np.abs(j-id_new)/G_frontier.get_no_nodes()  # normalized
                             j_FIM = G_frontier.graph.edges([j], 'information')
                             I_j = np.array(list(j_FIM)[0][2])
+
                             FIM_LC = np.abs(I_j-I) * (0.+1.5*(loop_diff*LC_info_i))
                             # FIM_LC = I * (loop_diff*LC_info_i)                            
                             G_frontier.addEdge(j, id_new, 1, FIM_LC)
@@ -190,7 +184,7 @@ def hallucinateGraph(G, p_frontier, info_radius):
             fig, ax = plt.subplots(1, 2, figsize=(10, 5))
             ax[0].spy(G_frontier.compute_L(), color='b', precision=0, alpha=1, markersize=3) #laplacian of the weighted pose graph of each frontier
             x[0].set_title('Frontier laplacian')
-            ax[1].spy(G.compute_L(), precision=0, color='r', alpha=1, markersize=3) # laplacian of the weighted pose graph form the g2o map file ?
+            ax[1].spy(G.compute_L(), precision=0, color='r', alpha=1, markersize=3) # laplacian of the weighted pose graph fro+m the g2o map file ?
             ax[1].set_title('Graph laplacian')
             plt.show()
             wait_enterKey()
@@ -202,12 +196,11 @@ def hallucinateGraph(G, p_frontier, info_radius):
 
     return G_frontier, failed_hallucination
 
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Node~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def node():
-    global frontiers_, map_data_, robot_, f_path_pub_, forntier_ID, numoffrontiers ,infogain_frontiers   
+    global frontiers_, map_data_, robot_, f_path_pub_, forntier_ID, numoffrontiers ,infogain_frontiers,markerArray_pu,marker_pub   
 
     if SHOW_DEBUG_PATH_:
         global marker_hallucinated_graph_pub_
@@ -225,11 +218,10 @@ def node():
     rate = rospy.Rate(rateHz)
     rospy.Subscriber(map_topic, OccupancyGrid, mapCallBack)
     rospy.Subscriber(frontiers_topic, PointArray, frontiersCallBack)
-
-    rospy.Subscriber("frontier_onfigain", FrontierWithPath, info_frontiersCallBack)
-
-    f_path_pub_ = rospy.Publisher('/frontier_path', FrontierWithPath, queue_size=10)
-    chosen_frontier_pub_ = rospy.Publisher('/chosen_frontier', FrontierWithPath, queue_size=10)
+     
+    
+    markerArray_pub = rospy.Publisher("visualization_markerArray/EntropyPath2", MarkerArray, queue_size=10)    
+    marker_pub = rospy.Publisher("visualization_marker/EntropyPath", Marker, queue_size=10)
 
 
     if SHOW_DEBUG_PATH_:
@@ -253,7 +245,6 @@ def node():
     t_0 = rospy.get_time()
     t_f_acc_decision_making = 0
 
-    frontiermsg=FrontierWithPath()      
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     while not rospy.is_shutdown():
@@ -270,14 +261,14 @@ def node():
                 del centroids[i]
 
         n_centroids = len(centroids) # number of frontiers seen
-        numoffrontiers = len(centroids)
-        frontiermsg.totalfrontiers = numoffrontiers         
-
+ 
         rospy.loginfo("I saw {} frontiers ".format(n_centroids))
 
         # Get SLAM graph
         nodes, edges = getGraph(GRAPH_PATH_) # reads from the .g2o  pose graph file 
         G = weighted_pose_graph(nodes, edges, 'd_opt') # make a weighted pose graph from .g2o file 
+        #nx.draw(G, with_labels=True)
+        #plt.savefig("graph.png")
 
         # If no nodes (starting step) build graph with one edge at origin.
         n = float(G.get_no_nodes())
@@ -302,14 +293,16 @@ def node():
             for ip in range(0, n_centroids):  ##################### change this if only if you want to chage the frontier 
                 # Get frontier goal
                 p_frontier = np.array([centroids[ip][0], centroids[ip][1]])
+                robotposxy = robot_.getPosition()                
+                #entropy,markerArray, marker =  compute_entropy(map_data_,p_frontier[0],p_frontier[1],robotposxy) 
 
+                #markerArray_pub.publish(markerArray) 
+                #marker_pub.publish(marker)
+                
 
                 # Compute hallucinated pose graph 
-                G_frontier, flag = hallucinateGraph(G, p_frontier, info_radius) # towards every frontier candidate ?
-                frontiermsg.ID = forntier_ID
-                frontiermsg.name="{}st frontier".format(forntier_ID) 
-                forntier_ID = forntier_ID + 1
-
+                G_frontier, flag = hallucinateGraph(G, p_frontier, info_radius) # hallucinate the existing pose-graph towards every frontier candidate 
+               
                 if flag:
                     rospy.logerr(rospy.get_name() + ": No points in plan to frontier at " + format(p_frontier) +
                                  ". Assigning -Inf information!!")
@@ -320,22 +313,13 @@ def node():
                     L_anch = G_frontier.compute_anchored_L() # compute anchored laplacian 
                     _, t = np.linalg.slogdet(L_anch.todense()) # Compute the sign and (natural) logarithm of the determinant of an array.
                     spann = n_frontier ** (1 / n_frontier) * np.exp(t / n_frontier) # equation 42 of the journal paper
-                    infoGain.append(spann)
+                    rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))       
 
+                    infoGain.append(spann)# - entropy*100)
+                    rospy.loginfo("========= Info. gain  of forntier = {} is  {} \n\n".format(ip,infoGain[ip]))  
 
                     #rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))
-                    #rospy.loginfo("=========+++++++++++++++++++++++++=========================\n\n")
-                    
-                    
-
-                    frontiermsg.frontier_loc.x=p_frontier[0]
-                    frontiermsg.frontier_loc.y=p_frontier[1]
-                    frontiermsg.frontier_loc.theta=0     
-                    frontiermsg.spanning_trees = spann
-                    f_path_pub_.publish(frontiermsg)  
-
-
-                                  
+                    #rospy.loginfo("=========+++++++++++++++++++++++++=========================\n\n")                                                                        
 
         if robot_.getState() == 1:
             t_f_acc_decision_making += rospy.get_time() - t_0_decision_making
@@ -355,8 +339,6 @@ def node():
             rospy.loginfo("========= Winner forntier ID is =  {}\n\n".format(winner_id))
             rospy.loginfo("================+++++++++++++++++++++++++=========================\n\n")
 
-            forntier_ID = 0
-            numoffrontiers =0
 
             t_f_acc_decision_making += rospy.get_time() - t_0_decision_making
 
@@ -364,14 +346,10 @@ def node():
                           #format(np.column_stack((infoGain_record, centroid_record))))
             rospy.loginfo(robot_name + " assigned to " + str(centroid_record[winner_id]))
             initial_plan_position = robot_.getPosition()
-            frontiermsg2=FrontierWithPath()
-            frontiermsg2.chosenfrontierxy_pos.x= centroid_record[winner_id][0]
-            frontiermsg2.chosenfrontierxy_pos.y= centroid_record[winner_id][1]
-            
-            frontiermsg2.robotxy_pos.x = initial_plan_position[0] 
-            frontiermsg2.robotxy_pos.y  = initial_plan_position[1] 
-            
-            chosen_frontier_pub_.publish(frontiermsg2) 
+
+            winner_frontier_marker = draw_marker(centroid_record[winner_id][0],centroid_record[winner_id][1], [0.5,0.5,0.2],"square", 0.5)             
+            marker_pub.publish(winner_frontier_marker)
+          
             #rospy.loginfo("winner frontier loc is = {}".format(centroid_record[winner_id]))
             robot_.sendGoal(centroid_record[winner_id])
 
