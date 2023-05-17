@@ -53,7 +53,8 @@ def read_graph(options, args):
     return nodes_o, edges_o, nodes_opt, edges_oo
 
 def compute_optimality(A, e_opt='max', invert_matrix=False):
-    if invert_matrix: A = np.linalg.pinv(A)
+    if invert_matrix:
+        A = np.linalg.pinv(A)
 
     eigv2 = scipy.linalg.eigvalsh(A)
     if np.iscomplex(eigv2.any()):

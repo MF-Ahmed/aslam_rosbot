@@ -14,7 +14,6 @@ from weighted_pose_graph_class import weighted_pose_graph
 import utils as ut
 file_path = '/path/to/data.txt'
 
-
 from pandas import DataFrame
 python_version = sys.version_info[0]
 if python_version < 3:
@@ -45,14 +44,14 @@ if __name__ == '__main__':
         #ax = plt.gca()
         G_i.plot_graph('Trajectory', 'blue', False)
         G_o.plot_graph('Trajectory', 'red', True)
-        #plt.suptitle('Pose graph trajectory', fontsize=16)
-        #plt.xlabel('X (m)', fontsize=12)
-        #plt.ylabel('Y (m)', fontsize=12)
-        #plt.axis('equal')
-        #plt.legend()
-        #plt.grid()
-        #plt.show(block=1)
-        #print('Computation of spectral properties of the full graph.')
+        plt.suptitle('Pose graph trajectory', fontsize=16)
+        plt.xlabel('X (m)', fontsize=12)
+        plt.ylabel('Y (m)', fontsize=12)
+        plt.axis('equal')
+        plt.legend()
+        plt.grid()
+        plt.show(block=1)
+        print('Computation of spectral properties of the full graph.')
         #ut.wait_enterKey()
         avg = 2 * G_i.get_no_edges() / G_i.get_no_nodes()
         eigv_2 = G_i.compute_algcon() # compute the algebric connectivity, the second smallest eigenvalue of the Laplacian matrix of the graph
