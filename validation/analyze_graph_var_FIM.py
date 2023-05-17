@@ -12,6 +12,9 @@ import warnings
 from optparse import OptionParser
 from weighted_pose_graph_class import weighted_pose_graph
 import utils as ut
+file_path = '/path/to/data.txt'
+
+
 from pandas import DataFrame
 python_version = sys.version_info[0]
 if python_version < 3:
@@ -27,30 +30,29 @@ if __name__ == '__main__':
         parser.add_option("--optimized_nodes", dest="optimized_nodes", default="FRH_P_toro_opt_nodes.txt")
         parser.add_option("--optimized_edges", dest="optimized_edges", default="FRH_P_toro_opt_edges.txt")
         (options, args) = parser.parse_args()
+
         [nodes_i, edges_i, nodes_o, edges_o] = ut.read_graph(options, args)
         G_i = weighted_pose_graph(nodes_i, edges_i)
         G_o = weighted_pose_graph(nodes_o, edges_o)
-        G_t = weighted_pose_graph(nodes_i, edges_i, 't_opt')
-        G_d = weighted_pose_graph(nodes_i, edges_i, 'd_opt')
-        G_e = weighted_pose_graph(nodes_i, edges_i, 'e_opt')
-        G_te = weighted_pose_graph(nodes_i, edges_i, 'tilde_opt')
-
+        #G_t = weighted_pose_graph(nodes_i, edges_i, 't_opt')
+        #G_d = weighted_pose_graph(nodes_i, edges_i, 'd_opt')
+        #G_e = weighted_pose_graph(nodes_i, edges_i, 'e_opt')
+        #G_te = weighted_pose_graph(nodes_i, edges_i, 'tilde_opt')
         print('Pose graph plot.')
-        #ut.wait_enterKey()
-        fig_id += 1
-        plt.figure(fig_id)
-        ax = plt.gca()
+        ###ut.wait_enterKey()
+        #fig_id += 1
+        #plt.figure(fig_id)
+        #ax = plt.gca()
         G_i.plot_graph('Trajectory', 'blue', False)
         G_o.plot_graph('Trajectory', 'red', True)
-        plt.suptitle('Pose graph trajectory', fontsize=16)
-        plt.xlabel('X (m)', fontsize=12)
-        plt.ylabel('Y (m)', fontsize=12)
-        plt.axis('equal')
-        plt.legend()
-        plt.grid()
-        plt.show(block=1)
-
-        print('Computation of spectral properties of the full graph.')
+        #plt.suptitle('Pose graph trajectory', fontsize=16)
+        #plt.xlabel('X (m)', fontsize=12)
+        #plt.ylabel('Y (m)', fontsize=12)
+        #plt.axis('equal')
+        #plt.legend()
+        #plt.grid()
+        #plt.show(block=1)
+        #print('Computation of spectral properties of the full graph.')
         #ut.wait_enterKey()
         avg = 2 * G_i.get_no_edges() / G_i.get_no_nodes()
         eigv_2 = G_i.compute_algcon() # compute the algebric connectivity, the second smallest eigenvalue of the Laplacian matrix of the graph
@@ -66,14 +68,15 @@ if __name__ == '__main__':
         print('Algebraic Connectivity (lambda_2): ' + format(eigv_2))
         print('Normalized Tree connectivity = log(t)/log(n)*n-2: ' + format(spann))
         FIM = ut.build_fullFIM(G_i)
-        fig, ax = plt.subplots()
-        ax.spy(FIM, markersize=1, color='black')
-        ax.set_title('Sparsity pattern of the full FIM')
-        plt.show(block=1)
-        print('Sequential analysis of the full graph.')
+        #fig, ax = plt.subplots()
+        #ax.spy(FIM, markersize=2, color='black')
+        #ax.set_title('Sparsity pattern of the full FIM')
+        #plt.show(block=1)
+        #print('Sequential analysis of the full graph.')
         #ut.wait_enterKey()
+        ''' 
         reduced_G = weighted_pose_graph() ## empty nx graph
-        print("reduced_G  = {}".format(reduced_G))
+        #print("reduced_G  = {}".format(reduced_G))
         reduced_G_t = weighted_pose_graph()
         reduced_G_d = weighted_pose_graph()
         reduced_G_e = weighted_pose_graph()
@@ -92,12 +95,12 @@ if __name__ == '__main__':
         total_time = 0
         timing_L = []
         timing_FIM = []
-
-        for idx in range(0, 3):
-        # for idx in nodes_idx:
+         
+        for idx in range(0, 400):
+        #for idx in nodes_idx:
             if idx > 0:
                 subgraph_nodes = range(0, int(idx) + 1)
-                print("subgraph_nodes  = {}".format(subgraph_nodes))
+                #print("subgraph_nodes  = {}".format(subgraph_nodes))
                 if idx % 10 == 0:
                     print("Node: " + format(idx))
                 tic = time.time()
@@ -107,16 +110,14 @@ if __name__ == '__main__':
                 reduced_G_e.graph = G_e.graph.subgraph(subgraph_nodes)      # E-optimality weighted pose-graph
                 reduced_G_te.graph = G_te.graph.subgraph(subgraph_nodes)    # T_tilde-optimality weighted pose-graph
                 n_nodes = idx + 1
-
                 n_edges = reduced_G_d.get_no_edges()
-                print("n_edges = {}".format(n_edges))
+                #print("n_edges of reduced graph = {}".format(n_edges))
                 L_anch = reduced_G_d.compute_anchored_L()
-                print("L_anch = {}".format(L_anch))
-                _, t = np.linalg.slogdet(L_anch.todense())
-
+                #print("L_anch of reduced graph= {}".format(L_anch))
+                _, t = np.linalg.slogdet(L_anch.todense()) # compute the sign and natural log of the determinant of an Array
                 metric_spanning = n_nodes ** (1 / n_nodes) * np.exp(t / n_nodes)
-
                 graph_measure_t.append(metric_spanning)
+
                 metric_mu2 = reduced_G_e.compute_algcon()
                 graph_measure_alg.append(metric_mu2)
                 degs = [x[1] for x in reduced_G_t.graph.degree(weight='weight')]
@@ -182,6 +183,8 @@ if __name__ == '__main__':
         ax.legend(loc='upper left')
         plt.axis([None, None, None, None])
         plt.show(block=1)
+        '''
+
 
     except KeyboardInterrupt:
         plt.close('all')

@@ -245,8 +245,8 @@ def getGraph(filename):
                 node2 = np.float_(x.split(' ')[2]) # to node
                 etype = 0 if (abs(node1 - node2) == 1) else 1
                 delta = np.float_(x.split(' ')[3:6]) # three entries
-                FIM = np.float_(x.split(' ')[7:13]) # six entries? should'nt it be 9 entries? 
-                # because g2o saves the infromation matrix as an upper triangular form  serialization is q_11, q_12, q_13, q_22, q_23, q_33
+                FIM = np.float_(x.split(' ')[7:13]) # six entries because g2o saves the infromation matrix
+                #as an upper triangular form  serialization is q_11, q_12, q_13, q_22, q_23, q_33
                 #rospy.loginfo("FIM is {}".format(FIM))
                 edges.append(np.concatenate([np.array([node1, node2, etype]), delta, FIM]).ravel())
 
@@ -453,14 +453,7 @@ def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):
         occupency_values.append(gridValue(map_data_, Xp)) 
            
     marker = draw_marker(p_frontier_x,p_frontier_y, [0.5,0.5,1],"sphere", 0.7)        
-
-    #markerArray = MarkerArray()
-    #map_res = map_data_.info.resolution        
-    #map_orig_x_loc = map_data_.info.origin.position.x 
-    #map_orig_y_loc = map_data_.info.origin.position.y
-    #marker=Marker()
-    #marker.id=0
-            
+           
     occupancy_list = []
 
     try: 

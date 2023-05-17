@@ -12,7 +12,6 @@ Panels:
         - /Marker1
         - /Marker1/Namespaces1
         - /Map1
-        - /Map1/Status1
       Splitter Ratio: 0.5173160433769226
     Tree Height: 425
   - Class: rviz/Selection
@@ -115,7 +114,7 @@ Visualization Manager:
       Buffer Length: 1
       Class: rviz/Path
       Color: 25; 255; 0
-      Enabled: true
+      Enabled: false
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
@@ -134,7 +133,7 @@ Visualization Manager:
       Shaft Length: 0.10000000149011612
       Topic: /move_base_node/NavfnROS/plan
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
@@ -244,13 +243,13 @@ Visualization Manager:
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /visualization_marker_array
       Name: Karto_graph
       Namespaces:
-        karto: true
+        {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
@@ -318,13 +317,13 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /marker_hallucinated_graph
       Name: Hallucinated_Graph
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /visualization_marker/EntropyPath
@@ -334,21 +333,21 @@ Visualization Manager:
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /visualization_markerArray/EntropyPath2
       Name: MarkerArray
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /visualization_marker2
       Name: Marker
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Alpha: 0.699999988079071
       Class: rviz/Map
       Color Scheme: map
@@ -378,7 +377,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.1090810298919678
+      Distance: 13.42022705078125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -386,17 +385,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 2.402529239654541
-        Y: 1.0271040201187134
-        Z: 4.118083953857422
+        X: -1.2461532354354858
+        Y: -1.3670215606689453
+        Z: 4.11579704284668
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.5547963380813599
       Target Frame: <Fixed Frame>
-      Yaw: 4.705418586730957
+      Yaw: 4.755422592163086
     Saved: ~
 Window Geometry:
   Displays:

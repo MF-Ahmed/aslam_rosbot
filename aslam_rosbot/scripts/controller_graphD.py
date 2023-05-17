@@ -294,7 +294,7 @@ def node():
                 # Get frontier goal
                 p_frontier = np.array([centroids[ip][0], centroids[ip][1]])
                 robotposxy = robot_.getPosition()                
-                #entropy,markerArray, marker =  compute_entropy(map_data_,p_frontier[0],p_frontier[1],robotposxy) 
+                entropy,markerArray, marker =  compute_entropy(map_data_,p_frontier[0],p_frontier[1],robotposxy) 
 
                 #markerArray_pub.publish(markerArray) 
                 #marker_pub.publish(marker)

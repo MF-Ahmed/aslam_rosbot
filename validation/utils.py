@@ -2,7 +2,7 @@
 #
 # Julio Placed. University of Zaragoza. 2022.
 # jplaced@unizar.es
-
+import os
 import networkx as nx
 import numpy as np
 import heapq
@@ -10,6 +10,8 @@ import scipy
 import sys
 python_version = sys.version_info
 from constants import NMINEIG, EIG_TH
+
+
 
 def wait_enterKey():
     input("Press Enter to continue...") #if (python_version >= (3, 0)) else raw_input("Press Enter to continue...")
@@ -37,6 +39,7 @@ def read_graph(options, args):
             options.optimized_edges = options.graph_name + "_opt_edges.txt"
     else:
         print('Default graph.')
+
 
     if options.initial_nodes != '':
         nodes_o = np.genfromtxt(options.initial_nodes, usecols=(0, 1, 2, 3))
@@ -99,13 +102,14 @@ def compute_optimality_sparse(A, e_opt='max', invert_matrix=False):
 
 def build_fullFIM(graph):
     graph_size = nx.number_of_nodes(graph.graph)
+    print("graph_size = {}".format(graph_size))
     dim = 3
     A = np.zeros((graph_size * dim, graph_size * dim))
 
     for i in range(0, graph_size):
         edge_Info = graph.graph.edges([i], 'information')
         for (id1, id2, fisher) in edge_Info:
-            node1 = int(id1);
+            node1 = int(id1)
             node2 = int(id2)
             if node2 > node1:
                 FIM = fisher
@@ -117,5 +121,16 @@ def build_fullFIM(graph):
     diff = A - A.T
     if not np.all(np.abs(diff.data) < 1e-8):
         print("Error in build_fullFIM: Fisher Information matrix is not symmetric.")
-
     return A
+def save_value_to_txt(value, filename):
+    filepath = os.path.join(os.getcwd(), filename)
+    with open(filename, 'w') as file:
+        file.write(str(value))
+    print(f"Value {value} saved to {filename}.")
+
+def plot_data_from_txt(filename):
+    filepath = os.path.join(os.getcwd(), filename)
+    with open(filepath, 'r') as file:
+        value = float(file.read())
+        return value
+

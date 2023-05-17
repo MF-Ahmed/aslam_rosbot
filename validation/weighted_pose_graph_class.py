@@ -2,7 +2,7 @@
 #
 # Julio Placed. University of Zaragoza. 2022.
 # jplaced@unizar.es
-
+import os
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,15 +11,35 @@ import scipy
 import utils as ut
 from operator import itemgetter
 from constants import NMINEIG, EIG_TH
+import csv
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 
 class weighted_pose_graph:
     def __init__(self, nodes=None, edges=None, criteria='d_opt'):
         self.graph = nx.Graph()
+        filepath_opti = os.path.join(os.getcwd(), 'd-opt.txt')
+        filepath_poses = os.path.join(os.getcwd(), 'poses.csv')
+
+        with open(filepath_opti, 'w') as file:
+            pass
+        with open(filepath_poses, 'w') as file:
+            pass
+
         if (nodes is not None) and (edges is not None):
 
             for i in range(0, np.size(nodes, 0)):
                 p = [nodes[i][1], nodes[i][2], nodes[i][3]]
                 self.graph.add_node(nodes[i][0], pose=p, theta=nodes[i][3])
+
+                with open(filepath_poses, 'a', newline='') as file:
+                    # Create a CSV writer object
+                    writer = csv.writer(file)
+                    # Write the data to the CSV file
+                    writer.writerow([str(p[0]),str(p[1]),str(p[2])])
+
+
             for i in range(0, np.size(edges, 0)):
                 edge = (edges[i][0], edges[i][1])
                 delta = edges[i][3:6]
@@ -28,13 +48,14 @@ class weighted_pose_graph:
                      [I[1], I[3], I[4]],
                      [I[2], I[4], I[5]]]
                 A = ut.enforce_symmetry_list(A)
-
                 eigv2 = np.linalg.eigvals(A)
                 #eigv2 = scipy.linalg.eigvalsh(A)
                 eigv = eigv2[eigv2 > EIG_TH]
                 n = np.size(A, 1)
                 if criteria == 'd_opt':
                     opt_cri = np.exp(np.sum(np.log(eigv)) / n)
+                    with open(filepath_opti, 'a') as file:
+                        file.writelines(str(opt_cri)+'\r')
                 elif criteria == 'e_opt':
                     opt_cri = heapq.nsmallest(NMINEIG, eigv)[-1]
                 elif criteria == 't_opt':
@@ -42,6 +63,27 @@ class weighted_pose_graph:
                 elif criteria == 'tilde_opt':
                     opt_cri = np.max(eigv)
                 self.graph.add_edge(*edge, type=edges[i][2], delta=delta, information=A, weight=opt_cri)
+            data = np.array(np.loadtxt(filepath_opti))   # Read data from file
+            data = data/np.max(data) # normalize
+            #plt.xlim(0,len(edges))  # Set x-axis range
+            #plt.ylim(0, np.max(data))  # Set x-axis range
+            #plt.plot(data)
+            #plt.show()
+            poses = []
+            x=[]
+            y=[]
+            z=[]
+            with open(filepath_poses, 'r') as file:
+                # Create a CSV reader object
+                reader = csv.reader(file)
+                # Read each row in the CSV file
+                for row in reader:
+                    # Access the columns by index
+                    x.append(float(row[0]))
+                    y.append(float(row[1]))
+                    z.append(float(row[2]))
+                    # Do something with the data
+
         else:
             print("Graph initialized to None.")
 
@@ -50,7 +92,6 @@ class weighted_pose_graph:
         idx_to_drop = np.random.randint(0, np.shape(L)[1], 1)
         # convert a sparse  matrix to a coordinate format
         C = L.tocoo()
-
         keep = ~np.in1d(C.col, idx_to_drop)
         C.data, C.row, C.col = C.data[keep], C.row[keep], C.col[keep]
         C.col -= idx_to_drop.searchsorted(C.col)
@@ -88,6 +129,7 @@ class weighted_pose_graph:
     def plot_graph(self, label='Data', color='Blue', draw_l=False):
         if self.graph is not None:
             nodes = self.graph.nodes.data('pose')
+            print("graph Noes  = {}".format(nodes))
             poses_x = [el[1][0] for el in nodes]
             poses_y = [el[1][1] for el in nodes]
             plt.plot(poses_x, poses_y, '-', label=label, alpha=1, color=color)
