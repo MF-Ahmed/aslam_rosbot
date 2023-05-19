@@ -1,0 +1,51 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/usr/cartographer_ws/install_isolated/include/**",
+        "/home/usr/data/catkin_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/aslam_rosbot/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/base_local_planner/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/clear_costmap_recovery/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/costmap_2d/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/dwa_local_planner/include/**",
+        "/home/usr/data/catkin_ws/src/frontier_exploration/exploration_server/include/**",
+        "/home/usr/data/catkin_ws/src/m-explore/explore/include/**",
+        "/home/usr/data/catkin_ws/src/frontier_exploration/frontier_exploration/include/**",
+        "/home/usr/data/catkin_ws/src/gazebo_ros_2Dmap_plugin/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/global_planner/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/kobuki_plugins/include/**",
+        "/home/usr/data/catkin_ws/src/map-merge/map_merge_3d/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/map_server/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/move_base/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/move_slow_and_clear/include/**",
+        "/home/usr/data/catkin_ws/src/mpc_local_planner/mpc_local_planner/include/**",
+        "/home/usr/data/catkin_ws/src/m-explore/map_merge/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/nav_core/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/navfn/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/open_karto/include/**",
+        "/home/usr/data/catkin_ws/src/catkin_ws/src/ros-bridge/pcl_recorder/include/**",
+        "/home/usr/data/catkin_ws/src/frontier_exploration/polygon_layer/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/rosbot_fsm/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/rosbot_mpc/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/rotate_recovery/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/slam_karto_g2o/include/**",
+        "/home/usr/data/catkin_ws/src/slam_karto_gtsam/include/**",
+        "/home/usr/data/catkin_ws/src/turtlebot3/turtlebot3_slam/include/**",
+        "/home/usr/data/catkin_ws/src/aslam_rosbot/3dParty/navigation/voxel_grid/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
