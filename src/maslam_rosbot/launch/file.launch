@@ -1,0 +1,88 @@
+<!--  Launch file for single robot on Gazebo -->
+<launch>
+
+  <arg name="robot0_ns" value="robot_0"/>
+  <arg name="robot1_ns" value="robot_1"/>
+  <arg name="robot2_ns" value="robot_2"/>
+
+  <arg name="robot0_x" value="1.0"/>   <!--  3.0 for house   --> <!--  1.0 for Wherehouse   --> 
+  <arg name="robot0_y" value="5.0"/>   <!--  2.0 for house   --> <!--  5.0 for Wherehouse   --> 
+  <arg name="robot0_z" value="0.0"/>
+  <arg name="robot0_R" value="0.0"/>
+  <arg name="robot0_P" value="0.0"/>
+  <arg name="robot0_Y" value="1.57"/>
+
+  <arg name="robot1_x" value="35.0"/>  <!--  1.0 for house   --> <!--  35.0 for Wherehouse   --> 
+  <arg name="robot1_y" value="15.0"/>  <!--  1.0 for house   --> <!--  15.0 for Wherehouse   --> 
+  <arg name="robot1_z" value="0.0"/>
+  <arg name="robot1_R" value="0.0"/>
+  <arg name="robot1_P" value="0.0"/>
+  <arg name="robot1_Y" value="1.57"/>
+
+  <arg name="robot2_x" value="-1.0"/>   <!--  -1.0 for house   --> 
+  <arg name="robot2_y" value="2.0"/>    <!--  2.0 for house   --> 
+  <arg name="robot2_z" value="0.0"/>
+  <arg name="robot2_R" value="0.0"/>
+  <arg name="robot2_P" value="0.0"/>
+  <arg name="robot2_Y" value="1.57"/>
+
+  <env name="GAZEBO_RESOURCE_PATH" value="$(find maslam_rosbot)/launch/include/meshes"/>
+
+  <!-- Comment/uncomment the line for the correct world -->
+ <env name="GAZEBO_MODEL_PATH" value="$(find maslam_rosbot)/launch/include/worlds/small_house/models/house/"/> 
+  <!-- <env name="GAZEBO_MODEL_PATH" value="$(find maslam_rosbot)/launch/include/worlds/hospital/models/"/> -->
+
+
+  <!-- ################################ GAZEBO ################################ -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="gui" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="0"/>
+
+    <!-- Comment/uncomment the line for the correct world -->
+    <!--  <arg name="world_name" value="$(find maslam_rosbot)/launch/include/worlds/small_house/small_house.world"/> -->
+    <!-- <arg name="world_name" value="$(find maslam_rosbot)/launch/include/worlds/hospital/hospital.world"/> -->
+     <arg name="world_name" value="$(find maslam_rosbot)/launch/include/worlds/willowgarage_modified.world"/> 
+    <arg name="verbose" value="true"/>
+  </include>
+
+  <!-- ################################  ROBOT 0 ################################ -->
+  <group ns="$(arg robot0_ns)">
+    <include file="$(find maslam_rosbot)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot0_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot0_x) -y $(arg robot0_y) -z $(arg robot0_z) -R $(arg robot0_R) -P $(arg robot0_P) -Y $(arg robot0_Y)"/>
+    </include>
+
+    <include file="$(find maslam_rosbot)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot0_ns)"/>
+    </include>
+  </group>
+
+  <!-- ################################  ROBOT 1 ################################ -->
+  <group ns="$(arg robot1_ns)">
+    <include file="$(find maslam_rosbot)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot1_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot1_x) -y $(arg robot1_y) -z $(arg robot1_z) -R $(arg robot1_R) -P $(arg robot1_P) -Y $(arg robot1_Y)"/>
+    </include>
+
+    <include file="$(find maslam_rosbot)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot1_ns)"/>
+    </include>
+  </group>
+
+  <!-- ################################  ROBOT 2 ################################ -->
+  <!-- <group ns="$(arg robot2_ns)">
+    <include file="$(find maslam_rosbot)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot2_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot2_x) -y $(arg robot2_y) -z $(arg robot2_z) -R $(arg robot2_R) -P $(arg robot2_P) -Y $(arg robot2_Y)"/>
+    </include>
+
+    <include file="$(find maslam_rosbot)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot2_ns)"/>
+    </include>
+  </group> -->
+
+  <!-- ################################  RVIZ ################################ -->
+  <node pkg="rviz" type="rviz" name="rviz_multiple" args="-d $(find maslam_rosbot)/launch/include/rviz_config/multiple.rviz"/>
+
+</launch>

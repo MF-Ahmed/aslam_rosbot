@@ -1,0 +1,12 @@
+<launch>
+    <!-- ################################ ACTION SERVER ################################ -->
+    <node pkg="maslam_rosbot" type="server.py" name="merge_points" output="screen"/>
+
+    <!-- ################################ ACTION SERVER ################################ -->
+    <node pkg="maslam_rosbot" type="server_choose.py" name="choose_points" output="screen"/>
+
+    <!-- ################################ MANAGER ################################ -->
+    <node pkg="maslam_rosbot" type="manager.py" name="manager" output="screen">
+        <param name="num_robots" value="2"/>
+    </node>
+</launch>

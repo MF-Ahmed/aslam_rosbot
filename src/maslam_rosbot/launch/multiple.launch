@@ -1,0 +1,27 @@
+<launch>
+
+    <arg name="robot0_ns" value="robot_0"/>
+    <arg name="robot1_ns" value="robot_1"/>
+    <arg name="robot2_ns" value="robot_2"/>
+
+    <arg name="num_robots" value="2"/>
+
+    <!-- ################################  ROBOT 0 ################################ -->
+    <include file="$(find maslam_rosbot)/launch/include/graph_dopt.launch">
+      <arg name="robot_ns" value="$(arg robot0_ns)"/>
+      <arg name="num_robots" value="$(arg num_robots)"/>
+    </include>
+
+    <!-- ################################  ROBOT 1 ################################ -->
+    <include file="$(find maslam_rosbot)/launch/include/graph_dopt.launch">
+      <arg name="robot_ns" value="$(arg robot1_ns)"/>
+      <arg name="num_robots" value="$(arg num_robots)"/>
+    </include>
+
+    <!-- ################################  ROBOT 2 ################################ -->
+    <!-- <include file="$(find maslam_rosbot)/launch/include/graph_dopt.launch">
+      <arg name="robot_ns" value="$(arg robot2_ns)"/>
+      <arg name="num_robots" value="$(arg num_robots)"/>
+    </include> -->
+
+</launch>
