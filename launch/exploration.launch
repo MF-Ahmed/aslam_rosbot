@@ -1,0 +1,7 @@
+ <launch>      
+      <node pkg="aslam_rosbot_mpc" type="aslam_rosbot_mpc_node" respawn="false" name="explore" output="screen"> 
+         <rosparam command="load" file="$(find aslam_rosbot_mpc)/config/turtlebot3/frontier_params.yaml"/>
+          <remap from="costmap" to="/map"/>
+     </node>  
+     
+ </launch>    

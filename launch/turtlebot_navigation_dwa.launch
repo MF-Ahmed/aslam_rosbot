@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!--  ************** Navigation DWA  ***************  -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen"> 
+	<rosparam file="$(find aslam_turtlebot)/param/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+	<rosparam file="$(find aslam_turtlebot)/param/costmap_common_params.yaml" command="load" ns="local_costmap" /> 
+	<rosparam file="$(find aslam_turtlebot)/param/local_costmap_params.yaml" command="load" /> 
+	<rosparam file="$(find aslam_turtlebot)/param/global_costmap_params.yaml" command="load" /> 
+	<rosparam file="$(find aslam_turtlebot)/param/trajectory_planner.yaml" command="load" /> 
+	<remap from="cmd_vel" to="mobile_base/commands/velocity"/>	
+	<remap from="odom" to="odom"/> 
+	<remap from="scan" to="/base_scan"/> 
+	<param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/> 
+	<param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/> 
+	<param name="controller_frequency" value="10.0" /> 
+   </node> 
+</launch>

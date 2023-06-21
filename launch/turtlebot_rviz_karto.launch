@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<launch>
+  
+<env name="GAZEBO_RESOURCE_PATH" value="$(find aslam_turtlebot)/meshes"/>
+<env name="GAZEBO_MODEL_PATH" value="$(find aslam_turtlebot)/models/collection/"/> 
+
+
+
+ <include file="$(find aslam_turtlebot)/launch/turtlebot_robot.launch.xml">
+    <arg name="robot_name" value="robot_1"/>
+    <arg name="init_pose" value="-x 1.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+  </include> 
+
+  
+<!-- You can choose between two worlds -->
+
+<!--  <include file="$(find aslam_turtlebot)/launch/rosbot_gazebo_world.launch">  
+		<arg name="world" value="$(find aslam_rosbot)/worlds/aws_house_modified.world"/>
+		<arg name="gui" value="false"/> 
+		<arg name= "pos_x" value = "-1"/>
+		<arg name= "pos_y" value = "0"/>
+		<arg name= "pos_z" value = "0"/>
+		<arg name= "yaw" value = "0"/> 
+ </include> -->
+ 
+ 
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="gui" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="0"/>
+    <arg name="world_name" value="$(find aslam_turtlebot)/worlds/willowgarage_modified.world"/>
+    <arg name="verbose" value="true"/>
+  </include> 
+ 
+ <include file="$(find aslam_turtlebot)/launch/turtlebot_rviz.launch"> </include> 
+
+  <node pkg="slam_karto_g2o" type="slam_karto_g2o" name="slam_karto_g2o" output="screen">
+    <remap from="scan" to="base_scan"/>
+    <rosparam command="load" file="$(find aslam_turtlebot)/param/mapping_karto_g2o.yaml" />
+    <param name="odom_frame" value="odom"/>
+    <param name="map_frame" value="map"/>
+    <param name="base_frame" value="base_link"/>
+  </node> 
+  
+    
+   <!--  ************** Navigation DWA  ***************  -->
+        <include file="$(find aslam_turtlebot)/launch/turtlebot_navigation_dwa.launch"> </include> 
+    
+    
+      <node pkg="aslam_turtlebot" type="aslam_turtlebot_node" respawn="false" name="explore" output="screen"> 
+         <rosparam command="load" file="$(find aslam_turtlebot)/config/turtlebot3/frontier_params.yaml"/>
+          <remap from="costmap" to="/map"/>
+     </node>      
+    
+    <!--  ************** Navigation  MPC ***************  --> 
+      <!-- <include file="$(find aslam_turtlebot)/launch/turtlebot_navigation_mpc.launch"> </include> -->  
+
+     
+  <!-- <node pkg="aslam_turtlebot" type="teleop_node.py" name="turtlebot_teleop" output="screen">
+  </node> -->        
+    
+      <!-- <include file="$(find exploration_server)/launch/exploration.launch">  </include> --> 
+
+ <!-- Map server -->
+<!-- <arg name="map_1" default="/map"/> 
+   <node name="map_saver" pkg="map_server" type="map_saver" args="-f $(find aslam_turtlebot)/maps/maps">
+ 	<remap from="/map" to="$(arg map_1)"/>  </node> --> 
+
+  
+</launch>
