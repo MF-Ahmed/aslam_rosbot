@@ -27,6 +27,7 @@ namespace frontier_exploration {
 
     private:
         void makePlan();
+        void mytimercallback();
 
         void visualizeFrontiers(const std::vector<Frontier>& frontiers);
 
@@ -50,7 +51,15 @@ namespace frontier_exploration {
         actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> _mbClient;
         frontier_exploration::FrontierSearch _search;
         ros::Timer _explorationTimer;
+        ros::Timer _mytimer;
         ros::Timer _oneShotTimer;
+
+        ros::Time _ExpstartTime;
+        ros::Time _ExpendTime;
+        ros::Duration _Expduration;
+
+
+
 
         ros::ServiceServer _explorationStartSrv, _explorationAbortSrv;
         std::vector<geometry_msgs::Point> _frontierBlacklist;
@@ -63,6 +72,7 @@ namespace frontier_exploration {
         double _potentialScale, _gainScale;
         ros::Duration _progressTimeout;
         bool _visualize;
+        double _explorationTime;
     };
 } // namespace frontier_exploration
 

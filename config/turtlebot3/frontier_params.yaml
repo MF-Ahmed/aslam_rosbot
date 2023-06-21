@@ -23,3 +23,6 @@ minimum_frontier_size: 0.5
 
 # Publish RViz markers to visualise frontiers
 visualize: true
+
+# Exploration Time in seconds
+explorationTime : 120.0

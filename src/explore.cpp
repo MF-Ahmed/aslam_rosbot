@@ -17,7 +17,9 @@ namespace frontier_exploration {
         _gainScale(1.0),
         _visualize(true), // changed by farhan
         _active(false),
-        _search{}        
+        _search{}, 
+        _explorationTime(60.0)      
+
     {
         double timeout;
         double minFrontierSize;
@@ -28,6 +30,7 @@ namespace frontier_exploration {
         _pnh->param("potential_scale", _potentialScale, 1e-3);
         _pnh->param("gain_scale", _gainScale, 1.0);
         _pnh->param("minimum_frontier_size", minFrontierSize, 0.5);
+        _pnh->param("explorationTime", _explorationTime, 60.0); // Farhan
 
         _search = frontier_exploration::FrontierSearch(_costmapClient.getCostmap(), _potentialScale,
                                                        _gainScale, minFrontierSize);
@@ -49,7 +52,14 @@ namespace frontier_exploration {
         ATTRIBUTE_UNUSED(_explorationStartSrv);
         ATTRIBUTE_UNUSED(_explorationAbortSrv);
 
-        _explorationTimer = _nh->createTimer(ros::Duration(1. / _plannerFrequency),[this](const ros::TimerEvent&) { makePlan(); });// changed from 1. to 10 by Farhan
+        _explorationTimer = _nh->createTimer(ros::Duration(1.0 / _plannerFrequency),[this](const ros::TimerEvent&) { makePlan(); });// changed from 1. to 10 by Farhan
+         
+        //_mytimer = _nh->createTimer(ros::Duration(20),[this](const ros::TimerEvent&) { mytimercallback(); });
+
+        _ExpstartTime = ros::Time::now();
+   
+
+
         //_oneShotTimer = _nh->createTimer(ros::Duration(1. / _plannerFrequency),[this](const ros::TimerEvent&) { makePlan();},true); // changed from 1. to 10 by Farhan
                 
         _active = true;
@@ -123,6 +133,15 @@ namespace frontier_exploration {
         
     }
 
+    void Explore::mytimercallback()
+    {
+        ;
+
+    }
+
+
+
+
     void Explore::makePlan()
     {
         if (!_active)
@@ -176,20 +195,50 @@ namespace frontier_exploration {
         }
 
         // we don't need to do anything if we are still pursuing the same goal
-        if (sameGoal)
+        if (sameGoal){
+            ROS_INFO("Got the same Goal again"); 
             return;
-
-        // send goal to move_base if we have a new frontier to pursue
+        }                       
+       // send goal to move_base if we have a new frontier to pursue
         move_base_msgs::MoveBaseGoal goal;
         goal.target_pose.pose.position = targetPosition;
         goal.target_pose.pose.orientation.w = 1.;
         goal.target_pose.header.frame_id = _costmapClient.getGlobalFrameID();
         goal.target_pose.header.stamp = ros::Time::now();
-        _mbClient.sendGoal(
-            goal, [this, targetPosition](const actionlib::SimpleClientGoalState& status, const move_base_msgs::MoveBaseResultConstPtr& result) {
-                reachedGoal(status, result, targetPosition);
-            });
-        ROS_INFO("Moving towards [%.2f, %.2f] goal position", goal.target_pose.pose.position.x, goal.target_pose.pose.position.y);
+        _mbClient.sendGoal(goal, [this, targetPosition](const actionlib::SimpleClientGoalState& status, const move_base_msgs::MoveBaseResultConstPtr& result) {
+               reachedGoal(status, result, targetPosition);});
+        //ROS_INFO("Moving towards [%.2f, %.2f] goal position", goal.target_pose.pose.position.x, goal.target_pose.pose.position.y);
+        
+        //ROS_INFO("Move base client Sate is %lu", _mbClient.getState());
+        /*
+        while(!(_mbClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED))
+        {
+             _active = false; 
+            _explorationTimer.stop();
+        }
+ 
+            _explorationTimer.start();
+            _active = true; 
+        
+        */
+
+        // Get the current time again
+        _ExpendTime = ros::Time::now();
+
+        // Calculate the time difference
+        _Expduration = _ExpendTime - _ExpstartTime;
+
+        // Convert the time difference to seconds
+        double durationSec = _Expduration.toSec();
+        ROS_INFO("Time Exploration Time Elapsed: %.3f seconds", durationSec);
+        if(durationSec > _explorationTime)
+        {
+            stop();
+            ROS_INFO(" *******************  Time Exploration Time Elapsed: %.3f seconds", durationSec);
+        }
+        // Print the time difference
+        
+            
     }
 
     bool Explore::goalOnBlacklist(const geometry_msgs::Point& goal)
@@ -221,8 +270,8 @@ namespace frontier_exploration {
         // callback for sendGoal, which is called in makePlan). the timer must live
         // until callback is executed.
 
-        _oneShotTimer = _nh->createTimer(ros::Duration(0, 0), [this](const ros::TimerEvent&) { makePlan(); }, true);
-        ATTRIBUTE_UNUSED(_oneShotTimer);
+       // _oneShotTimer = _nh->createTimer(ros::Duration(0, 0), [this](const ros::TimerEvent&) { makePlan(); }, true);
+        //ATTRIBUTE_UNUSED(_oneShotTimer);
         //stop();
 
     }
@@ -245,6 +294,7 @@ namespace frontier_exploration {
         if (_active)
             return;
         _explorationTimer.start();
+        _mytimer.start();
         _active = true;
     }
 
@@ -254,6 +304,7 @@ namespace frontier_exploration {
             return;
         _mbClient.cancelAllGoals();
         _explorationTimer.stop();
+        _mytimer.stop();
         ROS_INFO("Exploration aborted.");
         _active = false;
     }

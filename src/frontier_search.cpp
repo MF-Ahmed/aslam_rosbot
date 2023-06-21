@@ -35,6 +35,8 @@ namespace frontier_exploration {
             //return {};
         }
 
+
+
         std::vector<Frontier> frontierList;
 
         // make sure map is consistent and locked for duration of search

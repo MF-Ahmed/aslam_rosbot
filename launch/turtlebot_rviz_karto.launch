@@ -47,10 +47,10 @@
         <include file="$(find aslam_turtlebot)/launch/turtlebot_navigation_dwa.launch"> </include> 
     
     
-      <node pkg="aslam_turtlebot" type="aslam_turtlebot_node" respawn="false" name="explore" output="screen"> 
+      <!--  <node pkg="aslam_turtlebot" type="aslam_turtlebot_node" respawn="false" name="explore" output="screen"> 
          <rosparam command="load" file="$(find aslam_turtlebot)/config/turtlebot3/frontier_params.yaml"/>
           <remap from="costmap" to="/map"/>
-     </node>      
+     </node>   -->   
     
     <!--  ************** Navigation  MPC ***************  --> 
       <!-- <include file="$(find aslam_turtlebot)/launch/turtlebot_navigation_mpc.launch"> </include> -->  
