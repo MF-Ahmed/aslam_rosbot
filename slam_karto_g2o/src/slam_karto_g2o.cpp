@@ -30,6 +30,7 @@
 #include "tf/transform_listener.h"
 #include "tf/message_filter.h"
 #include "visualization_msgs/MarkerArray.h"
+#include <std_msgs/Bool.h>
 
 #include "nav_msgs/MapMetaData.h"
 #include "sensor_msgs/LaserScan.h"
@@ -77,6 +78,7 @@ class SlamKarto
     tf::MessageFilter<sensor_msgs::LaserScan>* scan_filter_;
     ros::Publisher sst_;
     ros::Publisher marker_publisher_;
+    ros::Publisher loopclosure_publisher_;
     ros::Publisher sstm_;
     ros::ServiceServer ss_;
 
@@ -127,7 +129,7 @@ SlamKarto::SlamKarto() :
   }
 
   if(!private_nh_.getParam("odom_frame", odom_frame_))
-    odom_frame_ = "odom";
+    odom_frame_ = "odom";  // default value if odom Frame is not passes as a parameter
   if(!private_nh_.getParam("map_frame", map_frame_))
     map_frame_ = "map";
   if(!private_nh_.getParam("base_frame", base_frame_))
@@ -157,6 +159,8 @@ SlamKarto::SlamKarto() :
   scan_filter_ = new tf::MessageFilter<sensor_msgs::LaserScan>(*scan_filter_sub_, tf_, odom_frame_, 5);
   scan_filter_->registerCallback(boost::bind(&SlamKarto::laserCallback, this, _1));
   marker_publisher_ = node_.advertise<visualization_msgs::MarkerArray>("visualization_marker_array",1);
+  loopclosure_publisher_ = node_.advertise<std_msgs::Bool>("loopclosure_topic", 10);
+
 
   // Create a thread to periodically publish the latest map->odom
   // transform; it needs to go out regularly, uninterrupted by potentially
@@ -733,8 +737,7 @@ bool SlamKarto::addScan(karto::LaserRangeFinder* laser,
     }
 
     map_to_odom_mutex_.lock();
-    map_to_odom_ = tf::Transform(tf::Quaternion( odom_to_map.getRotation() ),
-                                 tf::Point(      odom_to_map.getOrigin() ) ).inverse();
+    map_to_odom_ = tf::Transform(tf::Quaternion( odom_to_map.getRotation() ), tf::Point(      odom_to_map.getOrigin() ) ).inverse();
     map_to_odom_mutex_.unlock();
 
 

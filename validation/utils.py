@@ -40,11 +40,12 @@ def read_graph(options, args):
     else:
         print('Default graph.')
 
-
     if options.initial_nodes != '':
         nodes_o = np.genfromtxt(options.initial_nodes, usecols=(0, 1, 2, 3))
+        print("nodes_o = {}".format(nodes_o[1]))
     if options.initial_edges != '':
         edges_o = np.genfromtxt(options.initial_edges, usecols=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+        print("edges_o = {}".format(edges_o[1]))
     if options.optimized_nodes != '':
         nodes_opt = np.genfromtxt(options.optimized_nodes, usecols=(0, 1, 2, 3))
     if options.optimized_edges != '':
@@ -102,21 +103,29 @@ def compute_optimality_sparse(A, e_opt='max', invert_matrix=False):
         return t_opt, d_opt, a_opt, e_opt, tilde_opt
 
 def build_fullFIM(graph):
-    graph_size = nx.number_of_nodes(graph.graph)
-    print("graph_size = {}".format(graph_size))
+    graph_nodes = nx.number_of_nodes(graph.graph)
+    graph_edges = nx.number_of_edges(graph.graph)
+    print("graph has {} nodes and {} edges" .format(graph_nodes, graph_edges))
     dim = 3
-    A = np.zeros((graph_size * dim, graph_size * dim))
+    A = np.zeros(((graph_nodes) * dim, (graph_nodes) * dim))
 
-    for i in range(0, graph_size):
+    for i in range(0, graph_nodes):
         edge_Info = graph.graph.edges([i], 'information')
+        print("edge_Info = {}".format(edge_Info))
         for (id1, id2, fisher) in edge_Info:
             node1 = int(id1)
             node2 = int(id2)
+            print("node1 = {}".format(node1))
+            print("node2 = {}".format(node2))
+
             if node2 > node1:
                 FIM = fisher
                 FIM = np.array(FIM)
+                #print("A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim] = {}".format(A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim]))
                 A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim] += FIM
+
                 A[(node1) * dim:(node1 + 1) * dim, (node1) * dim:(node1 + 1) * dim] += FIM
+                print("A = {}".format(A))
                 A[(node1) * dim:(node1 + 1) * dim, (node2) * dim:(node2 + 1) * dim] = - FIM
                 A[(node2) * dim:(node2 + 1) * dim, (node1) * dim:(node1 + 1) * dim] = - FIM
     diff = A - A.T

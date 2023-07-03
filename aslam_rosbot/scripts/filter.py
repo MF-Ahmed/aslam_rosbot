@@ -83,7 +83,7 @@ def frontiersCallBack(data, args):
         for ip in range(0, originalLen):
             i = ip - originalLen + len(temp_array)
             t_diff = np.abs(temp_time[i] - rospy.get_time())
-            if t_diff > 5.0:
+            if t_diff > 2:  # changed from 5.0  by Farhan
                 rospy.logdebug("Deleted a frontier with timestamp diff = " + str(t_diff))
                 del temp_array[i]
                 del temp_time[i]
@@ -92,8 +92,8 @@ def frontiersCallBack(data, args):
         f_timestamps_ = copy(temp_time)
         assert (len(frontiers_) == len(f_timestamps_))
     else:
-        rospy.logerr("Frontier callback failed due to dimension mismatch of " + str(
-            len(temp_array) - len(temp_time)) + ". Skipping callback.")
+        rospy.logerr("Frontier callback failed due to dimension mismatch of " + str(len(temp_array) - len(temp_time)) + ". Skipping callback.") # need to look into this error
+
 
 def mapCallBack(data):
     global map_data_

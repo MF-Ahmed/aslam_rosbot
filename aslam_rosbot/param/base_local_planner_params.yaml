@@ -5,7 +5,7 @@
 
 TrajectoryPlannerROS:
   # Robot Configuration Parameters
-  max_vel_x: 0.2
+  max_vel_x: 0.3  # changed from 0.2
   min_vel_x: 0.1
   max_vel_theta: 0.8
   min_vel_theta: -0.8
@@ -13,7 +13,7 @@ TrajectoryPlannerROS:
   min_in_place_vel_theta: 0.4
 
   acc_lim_theta: 2.0
-  acc_lim_x: 2.0
+  acc_lim_x: 3.0 #changed from 2.0
 
   escape_vel: -0.1
 
@@ -23,7 +23,7 @@ TrajectoryPlannerROS:
 
   # Differential-drive Robot Configuration
   holonomic_robot: false
-  acc_lim_y: 2.0
+  acc_lim_y: 3.0  # changed from 2.0
 
   # Trajectory Scoring Parameters
   meter_scoring: true

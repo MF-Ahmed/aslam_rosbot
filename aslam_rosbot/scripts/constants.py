@@ -1,6 +1,6 @@
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-EXPLORING_TIME_ = 30*60  # seconds
+EXPLORING_TIME_ = 30*60  # seconds changed from 30 mins to 10 mins 
 
 NMINEIG_ = 2
 

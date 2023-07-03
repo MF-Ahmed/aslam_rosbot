@@ -16,6 +16,7 @@ import numpy as np
 import numba as nb
 from numba import cuda
 
+import rospy
 import networkx as nx
 import scipy
 
@@ -231,7 +232,6 @@ def gridValue(mapData, Xp):
 def getGraph(filename):
     nodes = []
     edges = []
-
     with open(filename) as fp:
         lines = fp.readlines()
         for x in lines:
@@ -329,19 +329,25 @@ def cellInformation(mapData, point, r):
     index = index_of_point(mapData, point)
     r_region = int(r // mapData.info.resolution)
     init_index = index - r_region * (mapData.info.width + 1)
+    
+    #rospy.loginfo(" init_index = {}".format(init_index))
+
 
     for n in range(0, 2 * r_region + 1):
         start = n * mapData.info.width + init_index
         end = start + 2 * r_region
+
         limit = start + 2 * mapData.info.width
         for i in range(start, end + 1):
-            if 0 <= i < np.min([limit, len(mapData.data)]) and norm(
-                    np.array(point) - point_of_index(mapData, i)) <= r:
+            if 0 <= i < np.min([limit, len(mapData.data)]) and norm(np.array(point) - point_of_index(mapData, i)) <= r:
                 cells[0] += 1
+                #rospy.loginfo("cells[0] = {}".format(cells[0]))
                 if mapData.data[i] == -1:
                     cells[1] += 1  # Unknown
+                    #rospy.loginfo("cells[1] = {}".format(cells[1]))
                 elif mapData.data[i] == 100:
                     cells[2] += 1  # Occupied
+                    #rospy.loginfo("cells[2] = {}".format(cells[2]))
 
     # Normalized information gain due to unknown region
     unknown_area_gain = (float(cells[1]) / float(cells[0]))
@@ -380,6 +386,7 @@ def cellInformation_NUMBA(data, resolution, width, Xstartx, Xstarty, pointx, poi
     unknown_area_gain = (float(cells[1]) / float(cells[0]))
     # Normalized information gain due to LC candidates
     LC_gain = (float(cells[2]) / float(cells[0]))
+    #print("LC_gain = {}".format(LC_gain))
 
     return unknown_area_gain, LC_gain
 
@@ -394,6 +401,7 @@ def ray_tracing(mapData,start_point, end_point):
     """ Perform ray tracing from start_point to end_point """
     start_cell = get_map_cell(mapData,start_point)
     end_cell = get_map_cell(mapData,end_point)
+    distance = math.sqrt(math.pow(end_cell[0] - start_cell[0], 2) + math.pow(end_cell[1] - start_cell[1], 2))  
     ray_cells = []
     occupancy_values=[]    
     x0, y0 = start_cell
@@ -419,9 +427,7 @@ def ray_tracing(mapData,start_point, end_point):
             y += y_inc
             error += dx
         n -= 1 
-    return ray_cells
-
-
+    return distance, ray_cells
 
 def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):  
 
@@ -431,8 +437,8 @@ def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):
     start_point = Point(robotposxy[0], robotposxy[1] , 0)
     end_point = Point( p_frontier_x,p_frontier_y, 0)
 
-    ray_cells = ray_tracing(map_data_,start_point, end_point)  
-
+    distance, ray_cells = ray_tracing(map_data_,start_point, end_point) 
+    
     markerArray = MarkerArray()
     marker=Marker()
     marker.id=0        
@@ -452,7 +458,7 @@ def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):
         markerArray.markers.append(marker)  
         occupency_values.append(gridValue(map_data_, Xp)) 
            
-    marker = draw_marker(p_frontier_x,p_frontier_y, [0.5,0.5,1],"sphere", 0.7)        
+    marker = draw_marker(p_frontier_x,p_frontier_y, [0.5,0.5,1],"sphere", 0.3)        
            
     occupancy_list = []
 
@@ -465,19 +471,20 @@ def compute_entropy(map_data_,p_frontier_x,p_frontier_y,robotposxy):
                 prob=0.450 #yields high entropy and low uncertinaty and high information gain
             else:
                 rospy.loginfo("I got a different occupancy value of {}".format(occupancy_value))                               
-            try:                        
-                entropy +=  (-((prob * math.log2(prob) + (1 - prob)*math.log2(1 - prob)))) #* np.exp(-0.25 *  self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy))     
-                
+            try:                                    
+                entropy += (-((prob * math.log2(prob) + (1 - prob)*math.log2(1 - prob)))) #* np.exp(-0.25 * distance)     
+               
             except Exception as e:                        
                 rospy.logerr("problem computing the entropy {}".format(e))                
         # Do something with the occupancy value         
     except Exception as e:
         rospy.logerr("Error processing compute entropy method: {}".format(e))
 
+     
     if entropy !=0 and len(occupency_values)!=0:    
         entropy = entropy/len(occupency_values)     
 
-    return entropy,markerArray,marker 
+    return entropy,markerArray,marker,distance 
 
 
 def savetofile(data,frontierID):
@@ -500,6 +507,15 @@ def euclidean_distance( x1, y1, x2, y2):
     distance = math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))        
     return distance
 
+
+def count_digits_before_decimal(number):
+    number_str = str(number)
+    if '.' in number_str:
+        decimal_index = number_str.index('.')
+        digits_before_decimal = decimal_index
+    else:
+        digits_before_decimal = len(number_str)
+    return digits_before_decimal
 
 
 

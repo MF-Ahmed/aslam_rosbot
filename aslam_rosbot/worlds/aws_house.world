@@ -114,69 +114,69 @@
 	</model>
     -->
 
-	<model name='ChairA_01_001'>
+	<!-- <model name='ChairA_01_001'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>7.11516 0.209028 0.024685 1e-06 -0 -1.55607</pose>
-	</model>
-	<model name='ChairA_01_002'>
+    </model> -->
+	<!-- <model name='ChairA_01_002'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>6.25506 0.219468 0.011308 0 0 -1.50414</pose>
-	</model>
-	<model name='ChairA_01_003'>
+        </model> -->
+	<!-- <model name='ChairA_01_003'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>6.06678 1.68075 0.01 0 -0 1.56986</pose>
-	</model>
-	<model name='ChairA_01_004'>
+    </model> -->
+	<!-- <model name='ChairA_01_004'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>7.00277 1.67074 0 0 -0 1.52363</pose>
-	</model>
-	<model name='ChairA_01_005'>
+    </model> -->
+	<!-- <model name='ChairA_01_005'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>-8.270940 1.916650 0.036650 0 -0 0</pose>
-	</model>
-	<model name='ChairD_01_001'>
+    </model> -->
+	<!-- <model name='ChairD_01_001'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>-1.380775 4.104456 0 0 -0 -3.138741</pose>
-	</model>
-	<model name='ChairD_01_002'>
+    </model> -->
+	<!-- <model name='ChairD_01_002'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>0.325214 4.104456 0 0 -0 0</pose>
-	</model>
-    <model name='ChairD_01_003'>
+    </model> -->
+    <!-- <model name='ChairD_01_003'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_ChairA_01</uri>
         </include>
         <pose frame=''>-8.270775 -4.504456 0 0 -0 3.8</pose>
-	</model>
-	<model name='Chandelier_01_001'>
+    </model> -->
+	<!-- <model name='Chandelier_01_001'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_Chandelier_01</uri>
         </include>
         <pose frame=''>1.221061 4.155740 1.295000 0 -0 0</pose>
-	</model>
+    </model> -->
   <model name='Chandelier_01_002'>
         <static>true</static>
         <include>
@@ -279,13 +279,13 @@
         </include>
         <pose frame=''>2.512849 2.717787 0.002183 0 -0 0</pose>
 	</model> -->
-	<model name='Tablet_01_001'>
+	<!-- <model name='Tablet_01_001'>
         <static>true</static>
         <include>
             <uri>model://aws_robomaker_residential_Tablet_01</uri>
         </include>
         <pose frame=''>1.572830 -1.775857 0.401790 -0.020625 -0.000080 -0.006317</pose>
-	</model>
+    </model> -->
 	<model name='FitnessEquipment_01_001'>
         <static>true</static>
         <include>
@@ -847,5 +847,13 @@
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
     </light>
+	<plugin name='gazebo_occupancy_map' filename='libgazebo_2Dmap_plugin.so'>
+	    <map_resolution>0.05</map_resolution> <!-- in meters, optional, default 0.1 -->
+	    <map_height>0.2</map_height>         <!-- in meters, optional, default 0.3 -->
+	    <map_size_x>75</map_size_x>          <!-- in meters, optional, default 10 -->
+	    <map_size_y>75</map_size_y>          <!-- in meters, optional, default 10 -->
+	    <init_robot_x>0</init_robot_x>          <!-- x coordinate in meters, optional, default 0 -->
+	    <init_robot_y>0</init_robot_y>          <!-- y coordinate in meters, optional, default 0 -->
+	</plugin>
   </world>
 </sdf>

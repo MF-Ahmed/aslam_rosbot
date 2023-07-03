@@ -103,7 +103,6 @@ class ComputeEntropy(object):
         self.chosenfrontier_posx = data.chosenfrontierxy_pos.x   
         self.chosenfrontier_posy = data.chosenfrontierxy_pos.y  
 
-
         markerArray = MarkerArray()              
         marker = Marker()
         #value=gridValue(self.map_msg, Xp)        
@@ -135,6 +134,9 @@ class ComputeEntropy(object):
         """ Perform ray tracing from start_point to end_point """
         start_cell = self.get_map_cell(start_point)
         end_cell = self.get_map_cell(end_point)
+
+        distance = math.sqrt(math.pow(end_cell[0] - start_cell[0], 2) + math.pow(end_cell[1] - start_cell[1], 2))  
+
         ray_cells = []
         occupancy_values=[]
         
@@ -170,7 +172,10 @@ class ComputeEntropy(object):
                     #occupancy_values.append([map_data[cell[0], cell[1]]]) #= [map_data[cell[0], cell[1]]]
         #except Exception as e:  
             #rospy.logerr("problem computing the occupancy {}".format(e))  
-        return ray_cells
+
+
+
+        return  distance, ray_cells
         
     def getrobotposition(self):
         self.listener = tf.TransformListener()   
@@ -201,13 +206,16 @@ class ComputeEntropy(object):
 
         start_point = Point( robot_position[0] ,  robot_position[1] , 0)
         end_point = Point( frontier_plan.frontier_loc.x , frontier_plan.frontier_loc.y, 0)
-        ray_cells = self.ray_tracing(start_point, end_point)  
+        distance,ray_cells = self.ray_tracing(start_point, end_point)  
+        rospy.loginfo("distence = {}".format(distance))
+
 
         markerArray = MarkerArray()
         marker=Marker()
         marker.id=0        
         occupency_values =[]
-        map_res = self.map_msg.info.resolution        
+        map_res = self.map_msg.info.resolution      
+
         map_orig_x_loc = self.map_msg.info.origin.position.x 
         map_orig_y_loc = self.map_msg.info.origin.position.y    
 
@@ -229,18 +237,17 @@ class ComputeEntropy(object):
         map_orig_y_loc = self.map_msg.info.origin.position.y
         marker=Marker()
         marker.id=0
-        #robot_position = self.getrobotposition()
+        robot_position = self.getrobotposition()
 
-        #frontierposx= int((frontier_plan.frontier_loc.x  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
-        #frontierposy= int((frontier_plan.frontier_loc.y  - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)     
+        frontierposx= int((frontier_plan.frontier_loc.x  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        frontierposy= int((frontier_plan.frontier_loc.y  - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)     
 
-        #robotposx= int((robot_position[0]  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
-        #robotposy= int((robot_position[1] - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
+        robotposx= int((robot_position[0]  - self.map_msg.info.origin.position.x) / self.map_msg.info.resolution)
+        robotposy= int((robot_position[1] - self.map_msg.info.origin.position.y) / self.map_msg.info.resolution)  
 
-        #rospy.loginfo("Distance between the Robot and Frontier in pixels  is {}".format(self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy)))        
+        rospy.loginfo("Distance between the Robot and Frontier in pixels  is {}".format(self.euclidean_distance(robotposx,robotposy, frontierposx, frontierposy)))        
                 
         occupancy_list = []
-
         try: 
            for occupancy_value in occupency_values:   
                 occupancy_list.append(occupancy_value)                            
@@ -264,7 +271,7 @@ class ComputeEntropy(object):
         if entropy !=0 and len(occupency_values)!=0:    
             entropy = entropy/len(occupency_values)   
 
-        infogain =frontier_plan.spanning_trees - entropy*100     
+        infogain = frontier_plan.spanning_trees - entropy*100     
 
         #rospy.loginfo("occupancy_list has  {} no. of -1".format(occupancy_list.count(-1)))
         #rospy.loginfo("occupancy_list has  {} no. of 0".format(occupancy_list.count(0)))

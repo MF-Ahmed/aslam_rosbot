@@ -4,7 +4,8 @@
 *  All rights reserved.
 *
 *********************************************************************/
-
+#include "ros/ros.h"
+#include "ros/console.h"
 #include "G2OSolver.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/factory.h"
@@ -18,6 +19,8 @@
 #include <open_karto/Karto.h>
 #include <ros/console.h>
 #include <Eigen/StdVector>
+#include <std_msgs/Bool.h>
+
 
 typedef g2o::BlockSolver< g2o::BlockSolverTraits<-1, -1> > SlamBlockSolver;
 
@@ -82,7 +85,12 @@ void G2OSolver::Compute()
   optimizer_.initializeOptimization();
 
   optimizer_.setVerbose(true);
+  ROS_INFO("Found Possible Loop Closure Candidate, \n preforming global optimization.");
+
+  // loopclosure_flag = true // need to set this flag somehow
+
   ROS_INFO("[g2o] Optimization started.");
+
   int iter = optimizer_.optimize(2);
 
   if (iter > 0)

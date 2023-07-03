@@ -73,4 +73,14 @@
     <param name="info_radius" value="1.7"/>
   </node>
 
+
+  <node name="d_opti_plot" pkg="aslam_rosbot" type="d_opti_plot.py" output="screen">
+    <param name="topic" value="/d_optimality_publisher/Dopt/" />
+  </node>
+
+
+
+
+
+
 </launch>

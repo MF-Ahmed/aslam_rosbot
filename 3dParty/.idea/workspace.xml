@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="41813e61-c4db-44e4-b193-27ef917c4561" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../validation/averageplot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/cfg/informationGain.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/cfg/informationGain.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/launch/graph_dopt.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/launch/graph_dopt.launch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/launch/include/robot.launch.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/launch/include/robot.launch.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/launch/include/rviz_config/single.rviz" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/launch/include/rviz_config/single.rviz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/launch/include/worlds/willowgarage_modified.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/launch/include/worlds/willowgarage_modified.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/maps/maps.pgm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/maps/maps.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/maps/pose_graph.g2o" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/maps/pose_graph.g2o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/maps/pose_graph_hospital_mpc.g2o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/param/base_local_planner_params.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/param/base_local_planner_params.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/controller_graphD.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/controller_graphD.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/entropy.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/entropy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/filter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/filter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/obsavoidence.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/scripts/weighted_pose_graph_class.py" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/scripts/weighted_pose_graph_class.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_bookstore.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_bookstore.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_house.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_house.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_house_modified.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/aws_house_modified.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/cafe.world" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/factory.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/factory.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/hospital.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/hospital.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/hospital_modified.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/hospital_modified.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/office.world" beforeDir="false" afterPath="$PROJECT_DIR$/../aslam_rosbot/worlds/office.world" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aslam_rosbot/worlds/warehouse.world" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/Dopt_graph.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/Dopt_naive.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/RRT_exploration.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/SHR_entropy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/closest.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../results/random.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rosbot_mpc/cfg/nmpc.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../rosbot_mpc/cfg/nmpc.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../slam_karto_g2o/launch/karto_slam.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../slam_karto_g2o/launch/karto_slam.launch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../slam_karto_g2o/src/G2OSolver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../slam_karto_g2o/src/G2OSolver.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../slam_karto_g2o/src/slam_karto_g2o.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../slam_karto_g2o/src/slam_karto_g2o.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/analyze_graph_var_FIM.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/analyze_graph_var_FIM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/d-opt.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/d-opt.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/graph_to_g2o.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/graph_to_g2o.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/poses.csv" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/poses.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/savgol_filter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/savgol_filter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/strip_nodes_edges.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/strip_nodes_edges.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../validation/weighted_pose_graph_class.py" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/weighted_pose_graph_class.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Rbqh0HVkuvxzbCynAM80kmHGCB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="41813e61-c4db-44e4-b193-27ef917c4561" name="Changes" comment="" />
+      <created>1687529244128</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1687529244128</updated>
+    </task>
+    <servers />
+  </component>
+</project>

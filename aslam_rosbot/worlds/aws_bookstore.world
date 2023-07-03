@@ -459,7 +459,7 @@
         <pose frame="">0.012365 -0.000353 3.328605 0 -0 0</pose>
 	</model>
     -->
-
+   <!--
        <model name="ChairB_01_001">
         <include>
             <uri>model://aws_robomaker_retail_ChairB_01</uri>
@@ -571,7 +571,7 @@
             <uri>model://aws_robomaker_retail_ChairB_01</uri>
         </include>
         <pose frame="">-6.121492 0.195027 0.027272 0.001357 -0.001950 0.003291</pose>
-	</model>
+    </model> -->
 
 	<model name="ColumnB_01_002">
         <include>
@@ -1180,5 +1180,13 @@
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
     </light>
+      <plugin name='gazebo_occupancy_map' filename='libgazebo_2Dmap_plugin.so'>
+    <map_resolution>0.05</map_resolution> <!-- in meters, optional, default 0.1 -->
+    <map_height>0.3</map_height>         <!-- in meters, optional, default 0.3 -->
+    <map_size_x>75</map_size_x>          <!-- in meters, optional, default 10 -->
+    <map_size_y>75</map_size_y>          <!-- in meters, optional, default 10 -->
+    <init_robot_x>0</init_robot_x>          <!-- x coordinate in meters, optional, default 0 -->
+    <init_robot_y>0</init_robot_y>          <!-- y coordinate in meters, optional, default 0 -->
+    </plugin>
   </world>
 </sdf>

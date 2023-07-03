@@ -26,7 +26,7 @@ from matplotlib.collections import PatchCollection
 
 debug = False
 
-
+  
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Main Class~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,7 +35,9 @@ class weighted_pose_graph:
     def __init__(self, nodes=None, edges=None, criteria='d_opt'): # Values read from the .g2o file
         self.graph = nx.Graph() # compute an empty graph 
         self.criteria = criteria
+        opt_total = 0
         if (nodes is not None) and (edges is not None):
+            #rospy.loginfo("if (nodes is not None) and (edges is not None).")
             for i in range(0, np.size(nodes, 0)):
                 p = [nodes[i][1], nodes[i][2]]
                 self.graph.add_node(nodes[i][0], pose=p, theta=nodes[i][3])
@@ -52,20 +54,27 @@ class weighted_pose_graph:
                 
                 n = np.size(A, 1)
                 if criteria == 'd_opt':
-                    opt_cri = np.exp(np.sum(np.log(eigv)) / n)
-                    rospy.loginfo("The D opyimality of each edge in graph = {}".format(opt_cri)) # Farhan
-
+                    opt_cri = np.exp(np.sum(np.log(eigv)) / n)      
+                    opt_total = opt_total + opt_cri               
+                                              
                 else:
                     opt_cri = 0
+                    opt_total = 0
                     print("Error. Optimality criterion should be D-opt.")
+                               
                 self.graph.add_edge(*edge, type=edges[i][2], information=I, weight=opt_cri)
+            try:    
+                rospy.loginfo("The D opyimality of each edge in graph = {}".format(opt_total/np.size(edges, 0))) # Farhan
+            except:
+                pass
+
         elif nodes is not None:
-            print("Edges initialized to None.")
+            rospy.loginfo("Edges initialized to None.")
             for i in range(0, np.size(nodes, 0)):
                 p = [nodes[i][1], nodes[i][2]]
                 self.graph.add_node(nodes[i][0], pose=p)
         elif edges is not None:
-            print("Nodes initialized to None.")
+            rospy.loginfo("Nodes initialized to None.")
             for i in range(0, np.size(edges, 0)):
                 edge = (edges[i][0], edges[i][1])
                 I = edges[i][6:12]
@@ -77,8 +86,11 @@ class weighted_pose_graph:
                 n = np.size(A, 1)
                 if criteria == 'd_opt':
                     opt_cri = np.exp(np.sum(np.log(eigv)) / n)
+                    opt_total= opt_total + opt_cri 
+
                 else:
                     opt_cri = 0
+                    opt_total = 0
                     print("Error. Optimality criterion should be D-opt.")
                 self.graph.add_edge(*edge, type=edges[i][2], information=I, weight=opt_cri)
 
@@ -125,7 +137,6 @@ class weighted_pose_graph:
         C.data, C.row, C.col = C.data[keep], C.row[keep], C.col[keep]
         C.row -= idx_to_drop.searchsorted(C.row)  # decrement column indices
         C._shape = (C.shape[0] - len(idx_to_drop), C.shape[1])
-
         return C.tocsr()
 
     # Computes all eigenvalues of the Laplacian

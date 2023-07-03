@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Julio Placed. University of Zaragoza. 2022.
 # jplaced@unizar.es
@@ -6,15 +6,22 @@
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
+import sys,os
 import time
+import pandas as pd
+from scipy.signal import butter, filtfilt
+from scipy.signal import savgol_filter
 import warnings
 from optparse import OptionParser
 from weighted_pose_graph_class import weighted_pose_graph
 import utils as ut
-file_path = '/path/to/data.txt'
+base_file_path = '/home/usr/data/catkin_ws/src/aslam_rosbot/aslam_rosbot/maps/'
+#base_file_path = '/home/usr/data/catkin_ws/src/aslam_rosbot/validation/test/'
+file_name = 'pose_graph.g2o'
+
 
 from pandas import DataFrame
+
 python_version = sys.version_info[0]
 if python_version < 3:
     warnings.warn("Careful, using python version 2")
@@ -23,33 +30,92 @@ if __name__ == '__main__':
     try:
         fig_id = 0
         parser = OptionParser()
-        parser.add_option("--graph", dest="graph_name", default="FRH_P_toro")
-        parser.add_option("--initial_nodes", dest="initial_nodes", default="FRH_P_toro_nodes.txt")
-        parser.add_option("--initial_edges", dest="initial_edges", default="FRH_P_toro_edges.txt")
-        parser.add_option("--optimized_nodes", dest="optimized_nodes", default="FRH_P_toro_opt_nodes.txt")
-        parser.add_option("--optimized_edges", dest="optimized_edges", default="FRH_P_toro_opt_edges.txt")
+        parser.add_option("--graph", dest="graph_name", default="aloo")
+        parser.add_option("--initial_nodes", dest="initial_nodes", default=base_file_path+file_name+"_nodes.txt")
+        parser.add_option("--initial_edges", dest="initial_edges", default=base_file_path+file_name+"_edges.txt")
+        parser.add_option("--optimized_nodes", dest="optimized_nodes", default=base_file_path+file_name+"_nodes.txt")
+        parser.add_option("--optimized_edges", dest="optimized_edges", default=base_file_path+file_name+"_edges.txt")
+        filepath_opti = os.path.join(os.getcwd(), 'd-opt.txt')
         (options, args) = parser.parse_args()
 
         [nodes_i, edges_i, nodes_o, edges_o] = ut.read_graph(options, args)
         G_i = weighted_pose_graph(nodes_i, edges_i)
+
+        with open(filepath_opti, 'r') as file:
+            data = np.array(np.loadtxt(filepath_opti))  # Read data from file
+            data = data/np.max(data) # normalize
+            #print("data = {}".format(data))
+            #data_new = savgol_filter(data, 5, 4)
+            #data_new= np.convolve(data, 10, mode='same')
+            #plt.xlim(0,len(edges))  # Set x-axis range
+            #plt.ylim(0, np.max(data))  # Set x-axis range
+            #plt.plot(data_new)
+            #plt.show()
+            #content = file.readlines()
+            #print("Opti-content = {}".format(content))
+        # Create a figure and two subplots
+
+        #print("data = {}".format(type(data[10])))
+        #print("data_new = {}".format(data_new))
+        #print("Diff = {}".format(abs(data-data_new)))
+
+        #fig, (ax1, ax2) = plt.subplots(1, 2)
+        # Plot the first graph in the first subplot
+        #ax1.plot(data,data)
+        #ax1.set_xlabel('X1')
+        #ax1.set_ylabel('Y1')
+        #ax1.set_title('data')
+        # Plot the second graph in the second subplot
+        #ax2.plot(data,data_new)
+        #ax2.set_xlabel('X2')
+        #ax2.set_ylabel('Y2')
+        #ax2.set_title('data_new')
+
+        # Adjust the layout to prevent overlapping
+        #plt.tight_layout()
+        #plt.show()
         G_o = weighted_pose_graph(nodes_o, edges_o)
-        #G_t = weighted_pose_graph(nodes_i, edges_i, 't_opt')
-        #G_d = weighted_pose_graph(nodes_i, edges_i, 'd_opt')
-        #G_e = weighted_pose_graph(nodes_i, edges_i, 'e_opt')
-        #G_te = weighted_pose_graph(nodes_i, edges_i, 'tilde_opt')
+
+        with open(filepath_opti, 'r') as file:
+            data = np.array(np.loadtxt(filepath_opti))  # Read data from file
+            data = data/np.max(data) # normalize
+            #plt.xlim(0,len(edges))  # Set x-axis range
+            # Convert the list to a pandas Series
+            data = pd.Series(data)
+            plt.ylim(0, np.max(data))  # Set x-axis range
+            plt.grid(True)
+            #plt.plot(data)
+            # Calculate the running average
+            window_size = 20
+            running_average = data.rolling(window=window_size, min_periods=1).mean()
+            plt.suptitle('D-Optimality', fontsize=16)
+            # Plot the original data
+            plt.plot(data, label='Edge D-Optimality')
+            # Plot the running average
+            plt.plot(running_average, label='Running Average')
+            plt.legend()
+            plt.show()
+
+            #content = file.readlines()
+            #print("Opti-content = {}".format(content))
+
+        G_t = weighted_pose_graph(nodes_i, edges_i, 't_opt')
+        G_d = weighted_pose_graph(nodes_i, edges_i, 'd_opt')
+        G_e = weighted_pose_graph(nodes_i, edges_i, 'e_opt')
+        G_te = weighted_pose_graph(nodes_i, edges_i, 'tilde_opt')
         print('Pose graph plot.')
         ###ut.wait_enterKey()
-        #fig_id += 1
-        #plt.figure(fig_id)
-        #ax = plt.gca()
-        G_i.plot_graph('Trajectory', 'blue', False)
+        fig_id += 1
+        plt.figure(fig_id)
+        ax = plt.gca()
+        #G_i.plot_graph('Trajectory', 'blue', False)
         G_o.plot_graph('Trajectory', 'red', True)
-        plt.suptitle('Pose graph trajectory', fontsize=16)
+        plt.suptitle('Pose graph trajectory', fontsize=14)
         plt.xlabel('X (m)', fontsize=12)
         plt.ylabel('Y (m)', fontsize=12)
         plt.axis('equal')
         plt.legend()
-        plt.grid()
+        plt.grid(True)
         plt.show(block=1)
         print('Computation of spectral properties of the full graph.')
         #ut.wait_enterKey()
@@ -66,14 +132,22 @@ if __name__ == '__main__':
         print('Average Degree (d): ' + format(avg))
         print('Algebraic Connectivity (lambda_2): ' + format(eigv_2))
         print('Normalized Tree connectivity = log(t)/log(n)*n-2: ' + format(spann))
+
         FIM = ut.build_fullFIM(G_i)
-        #fig, ax = plt.subplots()
+        fig, ax = plt.subplots()
         #ax.spy(FIM, markersize=2, color='black')
-        #ax.set_title('Sparsity pattern of the full FIM')
-        #plt.show(block=1)
-        #print('Sequential analysis of the full graph.')
+      
+        #ax.spy(FIM, markersize=2, color='blue', linewidth=10,  precision=10)
+        ax.spy(FIM, precision=0.2, markersize=2, color ='blue')
+        #ax.set_title(label = 'Sparsity pattern of the full FIM', )
+        ax.set_title('Sparsity pattern of the full FIM', fontsize=14, fontweight='bold', color='black', pad =20)
+
+
+        plt.show(block=1)
+        print('Sequential analysis of the full graph.')
         #ut.wait_enterKey()
-        ''' 
+
+        '''
         reduced_G = weighted_pose_graph() ## empty nx graph
         #print("reduced_G  = {}".format(reduced_G))
         reduced_G_t = weighted_pose_graph()
@@ -94,7 +168,8 @@ if __name__ == '__main__':
         total_time = 0
         timing_L = []
         timing_FIM = []
-         
+
+        
         for idx in range(0, 400):
         #for idx in nodes_idx:
             if idx > 0:
@@ -126,7 +201,6 @@ if __name__ == '__main__':
                 graph_measure_max.append(metric_max)
                 toc = (time.time() - tic)
                 timing_L.append(toc)
-
                 tic = time.time()
                 FIM = ut.build_fullFIM(reduced_G)
                 t_opt_FIM, d_opt_FIM, a_opt_FIM, e_opt_FIM, tilde_opt_FIM = ut.compute_optimality(FIM, e_opt='both', invert_matrix=False)
@@ -181,11 +255,14 @@ if __name__ == '__main__':
         plt.minorticks_on()
         ax.legend(loc='upper left')
         plt.axis([None, None, None, None])
-        plt.show(block=1)
-        '''
+        plt.show(block=1)       
+        '''  
 
 
     except KeyboardInterrupt:
         plt.close('all')
         print('\n Exit requested.')
         sys.exit()
+    def moving_average(data, window_size):
+        window = np.ones(window_size) / window_size
+        return np.convolve(data, window, mode='same')

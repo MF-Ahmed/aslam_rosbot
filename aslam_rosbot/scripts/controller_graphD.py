@@ -14,20 +14,22 @@ import rospy
 import networkx as nx
 import numpy as np
 import heapq
-
+import subprocess
 from copy import deepcopy
 
 from constants import GRAPH_PATH_, PLAN_POINT_TH_, EXPLORING_TIME_, USE_GPU_, SHOW_DEBUG_PATH_, ODOM_COV_
 
-from functions import robot, wait_enterKey, getGraph, compute_entropy,createMarker, draw_marker
+from functions import *
 from weighted_pose_graph_class import weighted_pose_graph
 from aslam_rosbot.msg import PointArray
 from geometry_msgs.msg import PoseStamped, Pose, Point
 
 from visualization_msgs.msg import Marker, MarkerArray
 import matplotlib.pyplot as plt
+from std_msgs.msg import Int32, Float32
 from aslam_rosbot.msg import SinglePath
 from aslam_rosbot.msg import FrontierWithPath
+import random 
 
 if USE_GPU_:
     from functions import cellInformation_NUMBA
@@ -53,10 +55,10 @@ infogain_frontiers = FrontierWithPath()
 def info_frontiersCallBack(data):
     global infogain_frontiers
     infogain_frontiers = data
-    rospy.loginfo("frontier No. {}".format(infogain_frontiers.ID))
-    rospy.loginfo("has spanning trees. {}".format(infogain_frontiers.spanning_trees))
-    rospy.loginfo("and entropy {}".format(infogain_frontiers.entropy))
-    rospy.loginfo("with infogain {}".format(infogain_frontiers.infogain))        
+    #rospy.loginfo("frontier No. {}".format(infogain_frontiers.ID))
+    #rospy.loginfo("has spanning trees. {}".format(infogain_frontiers.spanning_trees))
+    #rospy.loginfo("and entropy {}".format(infogain_frontiers.entropy))
+    #rospy.loginfo("with infogain {}".format(infogain_frontiers.infogain))        
 
 def frontiersCallBack(data):
     global frontiers_
@@ -74,10 +76,12 @@ def mapCallBack(data):
     # 100 = occupied
     # -1 = unknown
 
+def save_map():
+    # Run the map_saver tool using subprocess
+    subprocess.call(["rosrun", "map_server", "map_saver", "-f", "/home/usr/data/catkin_ws/src/aslam_rosbot/aslam_rosbot/maps"])
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Functions~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Hallucinates graph along the path to a frontier and computes its utility
 def hallucinateGraph(G, p_frontier, info_radius):
@@ -89,8 +93,7 @@ def hallucinateGraph(G, p_frontier, info_radius):
     # Initialize hallucinated graph
     G_frontier = weighted_pose_graph()
     G_frontier.copy_graph(G.graph)
-    n = G.get_no_nodes()
-
+    n = G.get_no_nodes() # no. of nodes of the g2o file pose graph 
     failed_hallucination = False
 
     # Pose of last known node
@@ -100,17 +103,21 @@ def hallucinateGraph(G, p_frontier, info_radius):
     # Hallucinate path
     plan = Path()
     plan = robot_.makePlan(robot_.getPosition(), p_frontier)
-
+    #rospy.loginfo("Plan fron the robot position towards the frontier is  = {}".format(plan))
     n_points = int(len(plan))
 
     if n_points > 1:
         # Add new nodes & edges along the hallucinated path to the new frontier
         plan_nodes = np.ceil(n_points / PLAN_POINT_TH_)
         new_nodes = np.sort(np.random.choice(np.arange(1, n_points - 2), int(plan_nodes), replace=False))
+
         new_nodes = np.append(new_nodes, n_points-1)  # Add one last node at frontier's location
 
         id_last = id_new = n - 1
+        #rospy.loginfo("-----------id_last = {}".format(id_last))
         last_known_Info = G_frontier.graph.edges([id_last], 'information')
+        #rospy.loginfo("-------- last_known_Info = {}".format(last_known_Info))
+
 
         # wait_enterKey()
         for i in new_nodes:
@@ -121,7 +128,7 @@ def hallucinateGraph(G, p_frontier, info_radius):
             id_new += 1
             G_frontier.graph.add_node(id_new, pose=p_path, theta=th_path)
             last_Info = G_frontier.graph.edges([id_last], 'information')
-
+            #rospy.loginfo("-------- last_Information matrix  = {}".format(last_Info))
             try:
                 if list(last_Info)[0] and len(list(last_Info)[0]) == 3:
                     """
@@ -146,6 +153,12 @@ def hallucinateGraph(G, p_frontier, info_radius):
                                                                                   info_radius)
 
                     # Account for the expected unknown region that exists in that frontier
+                    #rospy.loginfo("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                    #rospy.loginfo("normalized_unk_region_info_i = {}".format(normalized_unk_region_info_i))
+                    #rospy.loginfo("LC_info_i = {}".format(LC_info_i))
+                    #rospy.loginfo("----------------------------------------------------------------")
+
+
                     new_FIM = ODOM_FIM_ * (1 + normalized_unk_region_info_i)
 
                     G_frontier.addEdge(id_last, id_new, 0, [new_FIM[0][0], new_FIM[0][1], new_FIM[0][2],
@@ -160,7 +173,7 @@ def hallucinateGraph(G, p_frontier, info_radius):
                         I = np.array(list(last_known_Info)[0][2])
                         # I2 = np.array(list(last_Info)[0][2])
                         for j in LC_candidates:
-                            rospy.loginfo("found loop closure candidate")
+                            #rospy.loginfo("found loop closure candidate")
                             # if np.random.random() > LC_info_i:
                             loop_diff = np.abs(j-id_new)/G_frontier.get_no_nodes()  # normalized
                             j_FIM = G_frontier.graph.edges([j], 'information')
@@ -222,6 +235,7 @@ def node():
     
     markerArray_pub = rospy.Publisher("visualization_markerArray/EntropyPath2", MarkerArray, queue_size=10)    
     marker_pub = rospy.Publisher("visualization_marker/EntropyPath", Marker, queue_size=10)
+    d_opt_pub = rospy.Publisher("d_optimality_publisher/Dopt", Float32, queue_size=10)  
 
 
     if SHOW_DEBUG_PATH_:
@@ -239,6 +253,7 @@ def node():
     robot_name = namespace + str(namespace_init_count)
     robot_ = robot(robot_name)
     robot_.sendGoal(robot_.getPosition())
+
     
 
     # Get ROS time in seconds
@@ -262,10 +277,31 @@ def node():
 
         n_centroids = len(centroids) # number of frontiers seen
  
-        rospy.loginfo("I saw {} frontiers ".format(n_centroids))
-
+        #rospy.loginfo("I saw {} frontiers ".format(n_centroids))
+        opt_total2 = 0
+ 
         # Get SLAM graph
         nodes, edges = getGraph(GRAPH_PATH_) # reads from the .g2o  pose graph file 
+        if edges is not []:
+            for i in range(0, np.size(edges, 0)):
+                edge = (edges[i][0], edges[i][1])
+                I = edges[i][6:12]  # six members
+                #rospy.loginfo("I =  {}".format(I))
+                A = [[I[0], I[1], I[2]],
+                     [I[1], I[3], I[4]],
+                     [I[2], I[4], I[5]]]
+                eigv2 = np.linalg.eigvals(A)
+                eigv = eigv2[eigv2 > 1e-8]
+               
+                n = np.size(A, 1)                
+                opt_cri = np.exp(np.sum(np.log(eigv)) / n)      
+                opt_total2 = opt_total2 + opt_cri               
+            try:    
+                #rospy.loginfo("The D opyimality 2 of each edge in graph = {}".format(opt_total2/np.size(edges, 0))) # Farhan
+                d_opt_pub.publish(opt_total2/np.size(edges, 0))
+            except:
+                pass    
+     
         G = weighted_pose_graph(nodes, edges, 'd_opt') # make a weighted pose graph from .g2o file 
         #nx.draw(G, with_labels=True)
         #plt.savefig("graph.png")
@@ -293,34 +329,47 @@ def node():
             for ip in range(0, n_centroids):  ##################### change this if only if you want to chage the frontier 
                 # Get frontier goal
                 p_frontier = np.array([centroids[ip][0], centroids[ip][1]])
+                #rospy.loginfo("computing the hallucinated graph for the {} frontier at {} {}".format(ip,p_frontier[0],p_frontier[1]))
                 robotposxy = robot_.getPosition()                
-                entropy,markerArray, marker =  compute_entropy(map_data_,p_frontier[0],p_frontier[1],robotposxy) 
+                entropy, markerArray, marker,distance =  compute_entropy(map_data_,p_frontier[0],p_frontier[1],robotposxy) 
+                inv_entropy = 1 - entropy   
 
-                #markerArray_pub.publish(markerArray) 
-                #marker_pub.publish(marker)
-                
-
+                markerArray_pub.publish(markerArray) 
+                marker_pub.publish(marker)
+                # if you want to filterout some frontiers here is a good time to do so 
                 # Compute hallucinated pose graph 
                 G_frontier, flag = hallucinateGraph(G, p_frontier, info_radius) # hallucinate the existing pose-graph towards every frontier candidate 
                
-                if flag:
-                    rospy.logerr(rospy.get_name() + ": No points in plan to frontier at " + format(p_frontier) +
-                                 ". Assigning -Inf information!!")
+                if flag or distance>350: # farhan
+                    rospy.logerr(rospy.get_name() + ": No points in plan to frontier at " + format(p_frontier) + ". Assigning -Inf information!!")
                     infoGain.append(-np.inf)
                 else:
                     # Compute no. of spanning trees <=> D-opt(FIM)
+                  
+                    #rospy.loginfo("I saw {} frontiers ".format(gf))
+
                     n_frontier = float(G_frontier.get_no_nodes())
                     L_anch = G_frontier.compute_anchored_L() # compute anchored laplacian 
                     _, t = np.linalg.slogdet(L_anch.todense()) # Compute the sign and (natural) logarithm of the determinant of an array.
                     spann = n_frontier ** (1 / n_frontier) * np.exp(t / n_frontier) # equation 42 of the journal paper
-                    rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))       
+                    eta = count_digits_before_decimal(spann) 
 
-                    infoGain.append(spann)# - entropy*100)
-                    rospy.loginfo("========= Info. gain  of forntier = {} is  {} \n\n".format(ip,infoGain[ip]))  
-
-                    #rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))
-                    #rospy.loginfo("=========+++++++++++++++++++++++++=========================\n\n")                                                                        
-
+                    #eta_minus1 = 10**float(eta-2) # Will tune Later 
+                    decay_factor = 0.6   # default 0.5 .. 0.05 not good(better coverage but less accuracy), 0.1 not good (less coverage but better accuracy)
+                    gamma = np.exp(-(decay_factor) * distance)
+                    #rospy.loginfo("distance = {}".format(distance))
+                    #rospy.loginfo("eta_minus1 = {}".format(eta_minus1))
+                    eta = 10**float(eta)
+                    #rospy.loginfo("eta = {}".format(eta))
+                    #rospy.loginfo("========= inv_entropy of forntier = {} is {}".format(ip,inv_entropy)) 
+                    entropy = inv_entropy*eta                    
+                    #rospy.loginfo("========= No. of Spanning trees of forntier = {} are {}".format(ip,spann))  
+                    #rospy.loginfo("========= inv_entropy*eta of forntier = {} is {}".format(ip,entropy))  
+                    #rospy.loginfo("========= Distance of forntier = {} are {}".format(ip,distance))                                             
+                    infoGain.append(spann+ entropy + gamma)
+                    #infoGain.append(distance)
+                    rospy.loginfo("========= Info. gain  of forntier {}  at  {}  is  {} \n\n".format(ip,p_frontier, infoGain[ip]))  
+                                                                  
         if robot_.getState() == 1:
             t_f_acc_decision_making += rospy.get_time() - t_0_decision_making
             rospy.logwarn("Robot is not available.")
@@ -336,9 +385,8 @@ def node():
                 centroid_record.append(centroids[ip])
 
             winner_id = infoGain_record.index(np.max(infoGain_record)) # winner frontier
-            rospy.loginfo("========= Winner forntier ID is =  {}\n\n".format(winner_id))
-            rospy.loginfo("================+++++++++++++++++++++++++=========================\n\n")
-
+            #rospy.loginfo("========= Winner forntier ID is =  {}\n\n".format(winner_id))
+            #rospy.loginfo("================+++++++++++++++++++++++++=========================\n\n")
 
             t_f_acc_decision_making += rospy.get_time() - t_0_decision_making
 
@@ -347,11 +395,12 @@ def node():
             rospy.loginfo(robot_name + " assigned to " + str(centroid_record[winner_id]))
             initial_plan_position = robot_.getPosition()
 
-            winner_frontier_marker = draw_marker(centroid_record[winner_id][0],centroid_record[winner_id][1], [0.5,0.5,0.2],"square", 0.5)             
+            winner_frontier_marker = draw_marker(centroid_record[winner_id][0],centroid_record[winner_id][1], [1,0,0],"cube",0.4)             
             marker_pub.publish(winner_frontier_marker)
           
             #rospy.loginfo("winner frontier loc is = {}".format(centroid_record[winner_id]))
             robot_.sendGoal(centroid_record[winner_id])
+            gf=0
 
             # If plan fails near to starting position, send new goal to the next best frontier
             if robot_.getState() != 3 and n_centroids != 1:
@@ -367,13 +416,13 @@ def node():
                         pass
                 else:
                     rospy.logwarn("Goal aborted away from previous pose (eucl = " + str(norm) + "). Recomputing.")
-
             rospy.sleep(delay_after_assignment)
 
         t_f = rospy.get_time() - t_0  # Get ROS time in seconds
         rospy.loginfo("Decision making accumulated time: " + format(t_f_acc_decision_making) + " [sec]" +
                       " \n Total consumed time: " + format(t_f) + " [sec]")
         if t_f >= EXPLORING_TIME_:
+            save_map()
             wait_enterKey()
         rate.sleep()
 
