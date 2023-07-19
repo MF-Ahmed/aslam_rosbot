@@ -42,10 +42,10 @@ def read_graph(options, args):
 
     if options.initial_nodes != '':
         nodes_o = np.genfromtxt(options.initial_nodes, usecols=(0, 1, 2, 3))
-        print("nodes_o = {}".format(nodes_o[1]))
+        #print("nodes_o = {}".format(nodes_o[1]))
     if options.initial_edges != '':
         edges_o = np.genfromtxt(options.initial_edges, usecols=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
-        print("edges_o = {}".format(edges_o[1]))
+        #print("edges_o = {}".format(edges_o[1]))
     if options.optimized_nodes != '':
         nodes_opt = np.genfromtxt(options.optimized_nodes, usecols=(0, 1, 2, 3))
     if options.optimized_edges != '':
@@ -111,21 +111,20 @@ def build_fullFIM(graph):
 
     for i in range(0, graph_nodes):
         edge_Info = graph.graph.edges([i], 'information')
-        print("edge_Info = {}".format(edge_Info))
+        #print("edge_Info = {}".format(edge_Info))
         for (id1, id2, fisher) in edge_Info:
             node1 = int(id1)
             node2 = int(id2)
-            print("node1 = {}".format(node1))
-            print("node2 = {}".format(node2))
+            #print("node1 = {}".format(node1))
+            #print("node2 = {}".format(node2))
 
             if node2 > node1:
                 FIM = fisher
                 FIM = np.array(FIM)
                 #print("A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim] = {}".format(A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim]))
                 A[(node2) * dim:(node2 + 1) * dim, (node2) * dim:(node2 + 1) * dim] += FIM
-
                 A[(node1) * dim:(node1 + 1) * dim, (node1) * dim:(node1 + 1) * dim] += FIM
-                print("A = {}".format(A))
+                #print("A = {}".format(A))
                 A[(node1) * dim:(node1 + 1) * dim, (node2) * dim:(node2 + 1) * dim] = - FIM
                 A[(node2) * dim:(node2 + 1) * dim, (node1) * dim:(node1 + 1) * dim] = - FIM
     diff = A - A.T

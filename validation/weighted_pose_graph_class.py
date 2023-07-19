@@ -129,15 +129,15 @@ class weighted_pose_graph:
     def plot_graph(self, label='Data', color='Blue', draw_l=False):
         if self.graph is not None:
             nodes = self.graph.nodes.data('pose')
-            print("graph Nodes  = {}".format(nodes))
+            #print("graph Nodes  = {}".format(nodes))
             poses_x = [el[1][0] for el in nodes]
             print('poses_x = {}'.format(poses_x))
             poses_y = [el[1][1] for el in nodes]
             plt.plot(poses_x, poses_y, '-', label=label, alpha=1, color=color)
             plt.suptitle('Trajectory')
             if draw_l:
-                plt.plot(poses_x[0], poses_y[0], '*', label='Start', color='green', alpha=1, markersize=10) # start 
-                plt.plot(poses_x[-1], poses_y[-1], 'd', label='End', color='blue', alpha=1, markersize=10)  # end 
+                plt.plot(poses_x[0], poses_y[0], '*', label='Start', color='black', alpha=1, markersize=15) # start
+                plt.plot(poses_x[-1], poses_y[-1], 'd', label='End', color='blue', alpha=1, markersize=12)  # end
                 label_added = False
                 edges_LC = self.get_LC_edges()                
                 for (u, v) in edges_LC:
@@ -148,10 +148,10 @@ class weighted_pose_graph:
                     poses_LC_y.append(self.graph.nodes[u]['pose'][1])
                     poses_LC_y.append(self.graph.nodes[v]['pose'][1])
                     if not label_added:
-                        plt.plot(poses_LC_x, poses_LC_y, linestyle='-', color='m', label='Loop Closure', alpha=1, marker='o', markeredgecolor='b', markersize=2.5)
+                        plt.plot(poses_LC_x, poses_LC_y, linestyle='-', color='green', label='Loop Closure', alpha=1, marker='o', markeredgecolor='b', markersize=2.5)
                         label_added = True
                     else:
-                        plt.plot(poses_LC_x, poses_LC_y, linestyle='-', color='m', alpha=1, marker='o', markeredgecolor='b', markersize=2.5)
+                        plt.plot(poses_LC_x, poses_LC_y, linestyle='-', color='green', alpha=1, marker='o', markeredgecolor='b', markersize=2.5)
                 
                 
                 

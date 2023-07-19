@@ -6,7 +6,7 @@
   <env name="GAZEBO_RESOURCE_PATH" value="$(find aslam_rosbot)/launch/include/meshes"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="gui" value="false"/>
+    <arg name="gui" value="true"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="debug" value="0"/>
     <arg name="world_name" value="$(find aslam_rosbot)/launch/include/worlds/willowgarage_modified.world"/>

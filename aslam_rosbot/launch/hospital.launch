@@ -8,10 +8,10 @@
 <env name="GAZEBO_MODEL_PATH" value="$(find aslam_rosbot)/models/collection/"/> 
   
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="gui" value="false"/>
+    <arg name="gui" value="true"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="debug" value="0"/>
-    <arg name="world_name" value="$(find aslam_rosbot)/worlds/hospital_modified.world"/>
+    <arg name="world_name" value="$(find aslam_rosbot)/worlds/hospital_modified/hospital_modified.world"/>
     <arg name="verbose" value="true"/>
   </include>
 

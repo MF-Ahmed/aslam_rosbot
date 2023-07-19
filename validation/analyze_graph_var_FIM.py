@@ -17,7 +17,7 @@ from weighted_pose_graph_class import weighted_pose_graph
 import utils as ut
 base_file_path = '/home/usr/data/catkin_ws/src/aslam_rosbot/aslam_rosbot/maps/'
 #base_file_path = '/home/usr/data/catkin_ws/src/aslam_rosbot/validation/test/'
-file_name = 'pose_graph.g2o'
+file_name = 'pose_graph_our_office.g2o'
 
 
 from pandas import DataFrame

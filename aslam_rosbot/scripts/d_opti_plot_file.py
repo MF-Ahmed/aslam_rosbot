@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import datetime
 import numpy as np
 
-
 '''
 Plots the No. of Spanning trees criteria vs the time 
 reads from the file at specific intervals and plots the no of spanning trees evolution
@@ -33,8 +32,6 @@ def goaltimecallback(data):
     #nodes, edges = getGraph(GRAPH_PATH_) # reads from the .g2o  pose graph file 
     #opti_total= read_opti (edges)   
     #plot(opti_total,data.data.secs)
-
-
 
 def getGraph(filename):
     nodes = []
