@@ -1,0 +1,6 @@
+[submodule "ros2_ws"]
+	path = ros2_ws
+	url = https://github.com/mmatteo-hub/ros2_ws
+[submodule "map_merging_node"]
+	path = map_merging_node
+	url = https://github.com/mmatteo-hub/map_merging_node

@@ -1,0 +1,26 @@
+<!-- jplaced@unizar.es
+ 2022, Universidad de Zaragoza -->
+
+<!-- Spawns the robot with a laser sensor -->
+
+<launch>
+
+  <arg name="robot_name"/>
+  <arg name="init_pose"/>
+
+  <param name="tf_prefix" type="string" value="$(arg robot_name)"/>
+  <rosparam command="load" file="$(find joint_state_controller)/joint_state_controller.yaml" />
+
+  <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="joint_state_controller" />
+
+  <param name="robot_description" command="$(find xacro)/xacro '$(find graph_d_exploration)/launch/include/urdf/rosbot.xacro'"/>
+
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot_name)"
+        args="$(arg init_pose) -unpause -urdf -param robot_description -model $(arg robot_name) -robot_namespace $(arg robot_name)" respawn="false">
+  </node>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" respawn="false" output="screen"/>
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+</launch>

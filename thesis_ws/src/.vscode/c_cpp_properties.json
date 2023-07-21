@@ -1,0 +1,36 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/matteomaragliano/thesis_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/base_local_planner/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/clear_costmap_recovery/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/costmap_2d/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/dwa_local_planner/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/global_planner/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/kobuki_plugins/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/map_server/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/move_base/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/move_slow_and_clear/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/nav_core/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/navfn/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/open_karto/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/rotate_recovery/include/**",
+        "/home/matteomaragliano/thesis_ws/src/slam_karto_g2o/include/**",
+        "/home/matteomaragliano/thesis_ws/src/3dParty/navigation/voxel_grid/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

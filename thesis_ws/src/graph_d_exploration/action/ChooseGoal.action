@@ -1,0 +1,17 @@
+# Action definition for choosing centroids
+# The goal specifies the client id and the matrix with the lists in which each element is of the form [Reward, X, Y]
+# The action server should try to choose the centroid that maximizes the information gain depending on the priority
+# of the robots (r0 > ... > rn)
+
+# Goal definition
+string client_id
+InfoMatrix matrix
+int8 rows
+---
+# Result definition
+# The result specifies the chosen points for each agent
+Point2D[] goals
+---
+# Feedback definition
+# The feedback specifies how many goals have already been chosen
+bool status

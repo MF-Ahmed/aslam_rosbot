@@ -1,0 +1,198 @@
+<!--  Launch file for single robot on Gazebo -->
+<launch>
+
+  <arg name="robot0_ns" value="robot_0"/>
+  <arg name="robot1_ns" value="robot_1"/>
+  <arg name="robot2_ns" value="robot_2"/>
+  <arg name="robot3_ns" value="robot_3"/>
+
+<!--  House more than 4 robots too hard to move -->
+<!--
+  <arg name="robot0_x" value="3.0"/>
+  <arg name="robot0_y" value="2.0"/>
+  <arg name="robot0_z" value="0.0"/>
+  <arg name="robot0_R" value="0.0"/>
+  <arg name="robot0_P" value="0.0"/>
+  <arg name="robot0_Y" value="0.0"/>
+
+  <arg name="robot1_x" value="1.0"/>
+  <arg name="robot1_y" value="2.0"/>
+  <arg name="robot1_z" value="0.0"/>
+  <arg name="robot1_R" value="0.0"/>
+  <arg name="robot1_P" value="0.0"/>
+  <arg name="robot1_Y" value="0.0"/>
+
+  <arg name="robot2_x" value="-1.0"/>
+  <arg name="robot2_y" value="2.0"/>
+  <arg name="robot2_z" value="0.0"/>
+  <arg name="robot2_R" value="0.0"/>
+  <arg name="robot2_P" value="0.0"/>
+  <arg name="robot2_Y" value="0.0"/>
+
+  <arg name="robot3_x" value="5.0"/>
+  <arg name="robot3_y" value="2.0"/>
+  <arg name="robot3_z" value="0.0"/>
+  <arg name="robot3_R" value="0.0"/>
+  <arg name="robot3_P" value="0.0"/>
+  <arg name="robot3_Y" value="0.0"/> -->
+
+  <!-- hospitaal -->
+  <!--<arg name="robot0_x" value="1.0"/>
+  <arg name="robot0_y" value="8.0"/>
+  <arg name="robot0_z" value="0.0"/>
+  <arg name="robot0_R" value="0.0"/>
+  <arg name="robot0_P" value="0.0"/>
+  <arg name="robot0_Y" value="0.0"/>
+
+  <arg name="robot1_x" value="-10.0"/>
+  <arg name="robot1_y" value="0.0"/>
+  <arg name="robot1_z" value="0.0"/>
+  <arg name="robot1_R" value="0.0"/>
+  <arg name="robot1_P" value="0.0"/>
+  <arg name="robot1_Y" value="0.0"/>
+
+  <arg name="robot2_x" value="10.0"/>
+  <arg name="robot2_y" value="0.0"/>
+  <arg name="robot2_z" value="0.0"/>
+  <arg name="robot2_R" value="0.0"/>
+  <arg name="robot2_P" value="0.0"/>
+  <arg name="robot2_Y" value="0.0"/>
+
+  <arg name="robot3_x" value="0.0"/>
+  <arg name="robot3_y" value="-9.0"/>
+  <arg name="robot3_z" value="0.0"/>
+  <arg name="robot3_R" value="0.0"/>
+  <arg name="robot3_P" value="0.0"/>
+  <arg name="robot3_Y" value="0.0"/>-->
+
+  <!-- willowGarage -->
+  <arg name="robot0_x" value="-6.0"/>
+  <arg name="robot0_y" value="0.0"/>
+  <arg name="robot0_z" value="0.0"/>
+  <arg name="robot0_R" value="0.0"/>
+  <arg name="robot0_P" value="0.0"/>
+  <arg name="robot0_Y" value="0.0"/>
+
+  <arg name="robot1_x" value="-6.0"/>
+  <arg name="robot1_y" value="6.0"/>
+  <arg name="robot1_z" value="0.0"/>
+  <arg name="robot1_R" value="0.0"/>
+  <arg name="robot1_P" value="0.0"/>
+  <arg name="robot1_Y" value="0.0"/>
+
+  <arg name="robot2_x" value="7.0"/>
+  <arg name="robot2_y" value="-7.0"/>
+  <arg name="robot2_z" value="0.0"/>
+  <arg name="robot2_R" value="0.0"/>
+  <arg name="robot2_P" value="0.0"/>
+  <arg name="robot2_Y" value="0.0"/>
+
+  <arg name="robot3_x" value="20.0"/>
+  <arg name="robot3_y" value="0.0"/>
+  <arg name="robot3_z" value="0.0"/>
+  <arg name="robot3_R" value="0.0"/>
+  <arg name="robot3_P" value="0.0"/>
+  <arg name="robot3_Y" value="0.0"/>
+
+  <!--office -->
+  <!-- <arg name="robot0_x" value="15.0"/>
+  <arg name="robot0_y" value="18.0"/>
+  <arg name="robot0_z" value="0.0"/>
+  <arg name="robot0_R" value="0.0"/>
+  <arg name="robot0_P" value="0.0"/>
+  <arg name="robot0_Y" value="0.0"/>
+
+  <arg name="robot1_x" value="16.0"/>
+  <arg name="robot1_y" value="5.0"/>
+  <arg name="robot1_z" value="0.0"/>
+  <arg name="robot1_R" value="0.0"/>
+  <arg name="robot1_P" value="0.0"/>
+  <arg name="robot1_Y" value="0.0"/>
+
+  <arg name="robot2_x" value="1.0"/>
+  <arg name="robot2_y" value="8.0"/>
+  <arg name="robot2_z" value="0.0"/>
+  <arg name="robot2_R" value="0.0"/>
+  <arg name="robot2_P" value="0.0"/>
+  <arg name="robot2_Y" value="0.0"/>
+
+  <arg name="robot3_x" value="-4.0"/>
+  <arg name="robot3_y" value="18.0"/>
+  <arg name="robot3_z" value="0.0"/>
+  <arg name="robot3_R" value="0.0"/>
+  <arg name="robot3_P" value="0.0"/>
+  <arg name="robot3_Y" value="0.0"/> -->
+
+  <env name="GAZEBO_RESOURCE_PATH" value="$(find graph_d_exploration)/launch/include/meshes"/>
+  <env name="GAZEBO_MODEL_PATH" value="$(find graph_d_exploration)/models/collection/"/>
+
+  <!-- Comment/uncomment the line for the correct world -->
+  <!-- <env name="GAZEBO_MODEL_PATH" value="$(find graph_d_exploration)/launch/include/worlds/small_house/models/house/"/>-->
+  <!-- <env name="GAZEBO_MODEL_PATH" value="$(find graph_d_exploration)/launch/include/worlds/hospital/models/"/> -->
+
+  <!-- ################################ GAZEBO ################################ -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="gui" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="0"/>
+
+    <!-- Comment/uncomment the line for the correct world -->
+    <!--<arg name="world_name" value="$(find graph_d_exploration)/launch/include/worlds/small_house/small_house.world"/>-->
+    <!-- <arg name="world_name" value="$(find graph_d_exploration)/launch/include/worlds/hospital/hospital_modified.world"/> -->
+     <arg name="world_name" value="$(find graph_d_exploration)/launch/include/worlds/willowGarage/willowGarage.world"/>
+    <!--<arg name="world_name" value="$(find graph_d_exploration)/launch/include/worlds/office/office.world"/>-->
+    <arg name="verbose" value="true"/>
+  </include>
+
+  <!-- ################################  ROBOT 0 ################################ -->
+  <group ns="$(arg robot0_ns)">
+    <include file="$(find graph_d_exploration)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot0_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot0_x) -y $(arg robot0_y) -z $(arg robot0_z) -R $(arg robot0_R) -P $(arg robot0_P) -Y $(arg robot0_Y)"/>
+    </include>
+
+    <include file="$(find graph_d_exploration)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot0_ns)"/>
+    </include>
+  </group>
+
+  <!-- ################################  ROBOT 1 ################################ -->
+  <group ns="$(arg robot1_ns)">
+    <include file="$(find graph_d_exploration)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot1_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot1_x) -y $(arg robot1_y) -z $(arg robot1_z) -R $(arg robot1_R) -P $(arg robot1_P) -Y $(arg robot1_Y)"/>
+    </include>
+
+    <include file="$(find graph_d_exploration)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot1_ns)"/>
+    </include>
+  </group>
+
+  <!-- ################################  ROBOT 2 ################################ -->
+  z<!--<group ns="$(arg robot2_ns)">
+    <include file="$(find graph_d_exploration)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot2_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot2_x) -y $(arg robot2_y) -z $(arg robot2_z) -R $(arg robot2_R) -P $(arg robot2_P) -Y $(arg robot2_Y)"/>
+    </include>
+
+    <include file="$(find graph_d_exploration)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot2_ns)"/>
+    </include>
+  </group>-->
+
+  <!-- ################################  ROBOT 3 ################################ -->
+  <!--<group ns="$(arg robot3_ns)">
+    <include file="$(find graph_d_exploration)/launch/include/robot.launch.xml">
+      <arg name="robot_name" value="$(arg robot3_ns)"/>
+      <arg name="init_pose" value="-x $(arg robot3_x) -y $(arg robot3_y) -z $(arg robot3_z) -R $(arg robot3_R) -P $(arg robot3_P) -Y $(arg robot3_Y)"/>
+    </include>
+
+    <include file="$(find graph_d_exploration)/launch/include/move_baseSafe.launch">
+      <arg name="namespace" value="$(arg robot3_ns)"/>
+    </include>
+  </group>-->
+
+  <!-- ################################  RVIZ ################################ -->
+  <node pkg="rviz" type="rviz" name="rviz_multiple" args="-d $(find graph_d_exploration)/launch/include/rviz_config/multiple.rviz"/>
+
+</launch>

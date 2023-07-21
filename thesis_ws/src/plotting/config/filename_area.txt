@@ -1,0 +1,4 @@
+house: 157.66
+hospital: 1243.37
+willowgarage: 2071.95
+office: 741.44
