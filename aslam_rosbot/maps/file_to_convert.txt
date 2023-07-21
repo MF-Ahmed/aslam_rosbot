@@ -1,7 +1,0 @@
-pose_graph_julio_office.g2o
-pose_graph_julio_willow.g2o
-posegraph_map_office_frontier.g2o
-posegraph_map_willow_frontiers.g2o
-pose_graph_our_office.g2o
-pose_graph_our_willow2.g2o
-pose_graph_our_willow.g2o

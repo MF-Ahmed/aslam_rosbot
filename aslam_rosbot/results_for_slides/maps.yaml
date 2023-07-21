@@ -1,7 +1,0 @@
-image: /home/usr/data/catkin_ws/src/aslam_rosbot/aslam_rosbot/maps.pgm
-resolution: 0.050000
-origin: [-19.252946, -19.994535, 0.000000]
-negate: 0
-occupied_thresh: 0.65
-free_thresh: 0.196
-
