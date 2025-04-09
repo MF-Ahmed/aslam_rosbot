@@ -12,5 +12,7 @@ Kindly cite this paper if you use this implementation.
 - Open Karto
 - ROSbot 2
 - Kobuki plugins
-
-
+- `sudo apt-get install libsuitesparse-dev`
+## ROS Specific Dependencies
+1. `sudo apt-get install ros-noetic-grid-map`
+2. `sudo apt-get install ros-noetic-move-base`
