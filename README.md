@@ -17,6 +17,8 @@ Kindly cite this paper if you use this implementation.
   ```bash
   sudo apt-get install libsuitesparse-dev
 ## ROS Specific Dependencies
-1. `sudo apt-get install ros-noetic-grid-map`
-2. `sudo apt-get install ros-noetic-move-base`
-3. `sudo apt-get install ros-noetic-robot-localization`
+1. ```bash
+     sudo apt-get install ros-noetic-grid-map
+3. `sudo apt-get install ros-noetic-move-base`
+4. `sudo apt-get install ros-noetic-robot-localization`
+5. `sudo apt-get install ros-noetic-costmap-converter `
