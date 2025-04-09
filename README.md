@@ -22,3 +22,5 @@ Kindly cite this paper if you use this implementation.
 3. `sudo apt-get install ros-noetic-move-base`
 4. `sudo apt-get install ros-noetic-robot-localization`
 5. `sudo apt-get install ros-noetic-costmap-converter `
+6. `sudo apt-get install ros-noetic-open-karto  `
+7. `sudo apt-get install ros-noetic-kobuki-core `
