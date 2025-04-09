@@ -16,3 +16,4 @@ Kindly cite this paper if you use this implementation.
 ## ROS Specific Dependencies
 1. `sudo apt-get install ros-noetic-grid-map`
 2. `sudo apt-get install ros-noetic-move-base`
+3. `sudo apt-get install ros-noetic-robot-localization`
