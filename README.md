@@ -17,10 +17,10 @@ Kindly cite this paper if you use this implementation.
   ```bash
   sudo apt-get install libsuitesparse-dev
 ## ROS Specific Dependencies
-1. ```bash
-     sudo apt-get install ros-noetic-grid-map
-3. `sudo apt-get install ros-noetic-move-base`
-4. `sudo apt-get install ros-noetic-robot-localization`
-5. `sudo apt-get install ros-noetic-costmap-converter `
-6. `sudo apt-get install ros-noetic-open-karto  `
-7. `sudo apt-get install ros-noetic-kobuki-core `
+ ```bash
+    sudo apt-get install ros-noetic-grid-map
+    sudo apt-get install ros-noetic-move-base
+    sudo apt-get install ros-noetic-robot-localization
+    sudo apt-get install ros-noetic-costmap-converter
+    sudo apt-get install ros-noetic-open-karto
+    sudo apt-get install ros-noetic-kobuki-core
