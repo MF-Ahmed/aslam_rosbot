@@ -16,6 +16,7 @@ Kindly cite this paper if you use this implementation.
 - **Libraries**: 
   ```bash
   sudo apt-get install libsuitesparse-dev
+  ```
 ## ROS Specific Dependencies
  ```bash
     sudo apt-get install ros-noetic-grid-map
